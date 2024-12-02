@@ -6,7 +6,7 @@ The `smartReports` package is designed to simplify and streamline the creation o
 
 - **`buildPlot`**: Facilitates the creation of various types of plots using `ggplot2`, `highcharter`, or `plotly`.
 - **`buildTable`**: Renders tables using `flextable`, `gt`, or `kableExtra`, offering extensive formatting options for different output formats.
-- **`buildReport`**: Generates comprehensive reports in multiple formats such as HTML, PDF, or Word using `quarto`, integrating plots and tables created with `buildPlot` and `buildTable`.
+- **`buildReport`**: Generates comprehensive reports in multiple formats such as HTML, PDF, or Word using `rmarkdown` and `quarto`, integrating plots and tables created with `buildPlot` and `buildTable`.
 
 The `smartReports` package provides a unified interface for generating visualizations, tables, and reports with consistent styling and customization options.
 
@@ -27,6 +27,92 @@ devtools::install_github("averriK/smartReports")
 ---
 
 ## Functions
+
+### buildTable
+
+Renders tables using `flextable`, `gt`, or `kableExtra` with extensive formatting options for different output formats such as HTML, PDF, and DOCX.
+
+#### Usage:
+
+```r
+buildTable(
+  .x,
+  library = "gt",
+  format = "html",
+  font.size.header = 14,
+  font.size.body = 12,
+  font.family.header = "Arial",
+  font.family.body = "Arial",
+  caption = NULL,
+  font.bold.header = TRUE,
+  font.bold.body = FALSE,
+  font.bold.all = NULL,
+  font.size.all = NULL,
+  font.family.all = NULL,
+  vlines.show = FALSE,
+  hlines.show = TRUE,
+  vlines.color = "grey",
+  hlines.color = "grey",
+  vlines.size = 1,
+  hlines.size = 1,
+  align.header = "center",
+  align.body = "left"
+)
+```
+
+#### Arguments:
+
+- **`.x`**: A data frame or data table to be rendered as a table.
+- **`library`**: The library to be used for rendering. Options are `"flextable"`, `"gt"`, and `"kable"`.
+- **`format`**: The output format. Options are `"html"`, `"pdf"`, and `"docx"`.
+- **`font.size.header`**: Numeric. Font size for the table header.
+- **`font.size.body`**: Numeric. Font size for the table body.
+- **`font.family.header`**: Character. Font family for the table header.
+- **`font.family.body`**: Character. Font family for the table body.
+- **`caption`**: Character. The table caption.
+- **`font.bold.header`**: Logical. Whether to bold the header font.
+- **`font.bold.body`**: Logical. Whether to bold the body font.
+- **`font.bold.all`**: Logical. If `TRUE`, bolds all text. Overrides `font.bold.header` and `font.bold.body`.
+- **`font.size.all`**: Numeric. Font size for all text. Overrides `font.size.header` and `font.size.body`.
+- **`font.family.all`**: Character. Font family for all text. Overrides `font.family.header` and `font.family.body`.
+- **`vlines.show`**: Logical. Whether to show vertical lines.
+- **`hlines.show`**: Logical. Whether to show horizontal lines.
+- **`vlines.color`**: Character. Color of vertical lines.
+- **`hlines.color`**: Character. Color of horizontal lines.
+- **`vlines.size`**: Numeric. Thickness of vertical lines.
+- **`hlines.size`**: Numeric. Thickness of horizontal lines.
+- **`align.header`**: Character. Alignment of header text. Options are `"center"`, `"left"`, `"right"`.
+- **`align.body`**: Character. Alignment of body text. Options are `"center"`, `"left"`, `"right"`.
+
+#### Example:
+
+```r
+library(smartReports)
+
+# Render a table using gt library for HTML format
+buildTable(
+  iris,
+  library = "gt",
+  format = "html",
+  font.size.header = 14,
+  font.size.body = 12,
+  font.family.header = "Arial",
+  font.family.body = "Arial",
+  font.bold.header = TRUE,
+  font.bold.body = FALSE,
+  vlines.show = TRUE,
+  hlines.show = TRUE,
+  vlines.color = "black",
+  hlines.color = "black",
+  vlines.size = 1,
+  hlines.size = 1,
+  align.header = "center",
+  align.body = "left",
+  caption = "Iris Dataset"
+)
+```
+
+---
 
 ### buildPlot
 
@@ -162,52 +248,6 @@ buildPlot(
 
 ---
 
-### buildTable
-
-Renders tables using `flextable`, `gt`, or `kableExtra` with various formatting options for different output formats such as HTML, PDF, and DOCX.
-
-#### Usage:
-
-```r
-buildTable(
-  .x,
-  library = "gt",
-  format = "html",
-  ...
-)
-```
-
-#### Arguments:
-
-- **`.x`**: A data frame or data table to be rendered as a table.
-- **`library`**: The library to be used for rendering. Options are `"flextable"`, `"gt"`, and `"kable"`.
-- **`format`**: The output format. Options are `"html"`, `"pdf"`, and `"docx"`.
-- **`...`**: Additional formatting parameters, such as font sizes, fonts, boldness, alignment, and line settings.
-
-#### Example:
-
-```r
-library(smartReports)
-
-# Render a table using gt library for HTML format
-buildTable(
-  iris,
-  library = "gt",
-  format = "html",
-  font.size.header = 14,
-  font.size.body = 12,
-  font.family.header = "Arial",
-  font.family.body = "Arial",
-  font.bold.header = TRUE,
-  vlines.show = FALSE,
-  hlines.show = TRUE,
-  align.header = "center",
-  align.body = "left"
-)
-```
-
----
-
 ### buildReport
 
 Generates comprehensive reports in various formats (HTML, PDF, Word) by integrating plots, tables, and narrative text using `rmarkdown`.
@@ -257,6 +297,15 @@ buildReport(
 
 ## Feature Highlights
 
+### Table Formatting (`buildTable`)
+
+- **Libraries Supported**: `flextable`, `gt`, `kableExtra`.
+- **Fonts and Styles**: Customize font sizes, families, and boldness for headers and body.
+- **Global Font Settings**: Use `font.size.all`, `font.family.all`, and `font.bold.all` to apply global font settings.
+- **Borders**: Control vertical and horizontal line visibility, colors, and thickness.
+- **Alignment**: Header and body text alignment options (`"center"`, `"left"`, `"right"`).
+- **Captioning**: Add captions to your tables for better clarity.
+
 ### Plot Customization (`buildPlot`)
 
 - **Plot Types**: Line, spline, point, column, bar, and more.
@@ -265,13 +314,6 @@ buildReport(
 - **Legends**: Layouts, alignments, visibility toggles.
 - **Fonts**: Customize font sizes for axes legends, group legends, plot titles, and subtitles.
 - **Advanced Options**: Fill polygons, display maximum absolute values, point markers, data labels.
-
-### Table Formatting (`buildTable`)
-
-- **Libraries Supported**: `flextable`, `gt`, `kableExtra`.
-- **Fonts and Styles**: Customize font sizes, families, boldness.
-- **Lines**: Control vertical and horizontal line visibility, colors, and thickness.
-- **Alignment**: Header and body text alignment options.
 
 ### Report Generation (`buildReport`)
 

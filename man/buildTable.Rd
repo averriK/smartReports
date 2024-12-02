@@ -31,57 +31,68 @@ buildTable(
 \arguments{
 \item{.x}{A data frame or data table to be rendered as a table.}
 
-\item{library}{The library to be used for rendering. Options are "flextable", "gt", and "kable".}
+\item{library}{The library to be used for rendering. Options are \code{"flextable"}, \code{"gt"}, and \code{"kable"}.}
 
-\item{format}{The output format. Options are "html", "pdf", and "docx".}
+\item{format}{The output format. Options are \code{"html"}, \code{"pdf"}, and \code{"docx"}.}
 
-\item{font.size.header}{The font size for the table header.}
+\item{font.size.header}{Numeric. Font size for the table header.}
 
-\item{font.size.body}{The font size for the table body.}
+\item{font.size.body}{Numeric. Font size for the table body.}
 
-\item{font.family.header}{The font family for the table header.}
+\item{font.family.header}{Character. Font family for the table header.}
 
-\item{font.family.body}{The font family for the table body.}
+\item{font.family.body}{Character. Font family for the table body.}
 
-\item{caption}{The table caption.}
+\item{caption}{Character. The table caption.}
 
 \item{font.bold.header}{Logical. Whether to bold the header font.}
 
 \item{font.bold.body}{Logical. Whether to bold the body font.}
 
-\item{font.bold.all}{Logical. Whether to bold all text. Overrides font.bold.header and font.bold.body.}
+\item{font.bold.all}{Logical. If \code{TRUE}, bolds all text. Overrides \code{font.bold.header} and \code{font.bold.body}.}
 
-\item{font.size.all}{Numeric. Font size for all text. Overrides font.size.header and font.size.body.}
+\item{font.size.all}{Numeric. Font size for all text. Overrides \code{font.size.header} and \code{font.size.body}.}
 
-\item{font.family.all}{Character. Font family for all text. Overrides font.family.header and font.family.body.}
+\item{font.family.all}{Character. Font family for all text. Overrides \code{font.family.header} and \code{font.family.body}.}
 
 \item{vlines.show}{Logical. Whether to show vertical lines.}
 
 \item{hlines.show}{Logical. Whether to show horizontal lines.}
 
-\item{vlines.color}{Color of vertical lines.}
+\item{vlines.color}{Character. Color of vertical lines.}
 
-\item{hlines.color}{Color of horizontal lines.}
+\item{hlines.color}{Character. Color of horizontal lines.}
 
-\item{vlines.size}{Thickness of vertical lines.}
+\item{vlines.size}{Numeric. Thickness of vertical lines.}
 
-\item{hlines.size}{Thickness of horizontal lines.}
+\item{hlines.size}{Numeric. Thickness of horizontal lines.}
 
-\item{align.header}{Alignment of header text. Options are "center", "left", "right".}
+\item{align.header}{Character. Alignment of header text. Options are \code{"center"}, \code{"left"}, \code{"right"}.}
 
-\item{align.body}{Alignment of body text. Options are "center", "left", "right".}
+\item{align.body}{Character. Alignment of body text. Options are \code{"center"}, \code{"left"}, \code{"right"}.}
 }
 \value{
 A formatted table rendered using the specified library and options.
 }
 \description{
 This function renders a table using the specified library and formatting options.
-It supports three libraries: flextable, gt, and kable.
+It supports three libraries: \code{flextable}, \code{gt}, and \code{kable}.
 }
 \examples{
 
-iris |> buildTable(library="gt")
-iris |> buildTable(library="flextable")
-iris |> buildTable(library="kable")
-
+# Render a table using gt library for HTML format
+buildTable(
+  iris,
+  library = "gt",
+  format = "html",
+  font.size.header = 14,
+  font.size.body = 12,
+  font.family.header = "Arial",
+  font.family.body = "Arial",
+  font.bold.header = TRUE,
+  font.bold.body = FALSE,
+  vlines.show = TRUE,
+  hlines.show = TRUE,
+  caption = "Iris Data Table"
+)
 }

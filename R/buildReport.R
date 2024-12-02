@@ -67,128 +67,130 @@ buildReport <- function(
   
   # Build YAML function
   .buildYAML <- function(){
-    
-    
-    
+
     LANG <- language
+
+    # Initialize DATA and LDATA as empty lists
+    DATA <- list()
+    LDATA <- list()
     
     # ---------------------------------------------------------------------------
     # Language-independent stage
-    DATA <- list()
-    
-    FIELD <- list(project=list(
-      type="default",
-      'output-dir'=build_dir
-    ),engine="knitr",jupyter="python3")
-    DATA <- c(DATA,FIELD)
-    
-    # ---------------------------------------------------------------------------
+
+    # Project settings
+    FIELD <- list(
+      project = list(
+        type = "default",
+        'output-dir' = build_dir
+      ),
+      engine = "knitr",
+      jupyter = "python3"
+    )
+    DATA <- .merge(DATA, FIELD)
+
+    # Bibliography
     PATH <- home_dir
-    FILE <- list.files(file.path(PATH) ,pattern = "references\\.bib$",recursive = TRUE,full.names = TRUE)
-    if(length(FILE)>0){
-
-      FIELD <- list(bibliography=FILE[1])
-      DATA <- c(DATA,FIELD)
-    } 
-    FILE <- list.files(file.path(PATH) ,pattern = "_authors\\.yml$",recursive = TRUE,full.names = TRUE)
-    if(length(FILE)>0){
-      FIELD <- read_yaml(FILE[1],readLines.warn=FALSE) # #|> paste(collapse = "\n")
-      FIELD$author <- Filter(.validAuthor, FIELD$author)
-      DATA <- c(DATA,FIELD)
-    } 
-    
-    
-    # ---------------------------------------------------------------------------
-    FILE <- list.files(file.path(PATH),pattern = "_params\\.yml$",recursive = TRUE,full.names = TRUE)
-    if(length(FILE)>0){
-      FIELD <- read_yaml(FILE[1],readLines.warn=FALSE) ## |> paste(collapse = "\n")
-      DATA <- c(DATA,FIELD)
-    } 
-    
-    
-    # ---------------------------------------------------------------------------
-    # format-specific stage
-    FILE <- list.files(file.path(PATH),pattern = "_format\\.yml$",recursive = TRUE,full.names = TRUE)
-    if(length(FILE)>0){
-      FIELD <- read_yaml(FILE[1],readLines.warn=FALSE) 
-      FIELD$format <- FIELD$format[names(FIELD$format) %in% output_format] 
-      if("els-pdf" %in% output_format && is.null(FIELD$format$`els-pdf`$journal$name)){
-        FIELD$`els-pdf`$journal$name <- gsub(DATA$subtitle, pattern="\n",replacement="")
-      }
-      
-    } 
-    
-    FILE <- list.files(file.path(PATH) ,pattern = "styles\\.docx$",recursive = TRUE,full.names = TRUE)
-    if(length(FILE)>0){
-     
-      if ("docx" %in% output_format) {
-        FIELD$format$docx$'reference-doc' <- FILE[1]        
-      }
-      
-    } 
-
-    FILE <- list.files(file.path(PATH) ,pattern = "styles\\.css$",recursive = TRUE,full.names = TRUE)
+    FILE <- list.files(file.path(PATH), pattern = "references\\.bib$", recursive = TRUE, full.names = TRUE)
     if (length(FILE) > 0) {
-      
-      if ("html" %in% output_format) {
-        FIELD$format$html$css <- FILE[1]
-      }
+      FIELD <- list(bibliography = FILE[1])
+      DATA <- .merge(DATA, FIELD)
     }
-    
-    DATA <- c(DATA,FIELD)
-    
 
+    # Authors
+    FILE <- list.files(file.path(PATH), pattern = "_authors\\.yml$", recursive = TRUE, full.names = TRUE)
+    if (length(FILE) > 0) {
+      FIELD <- read_yaml(FILE[1], readLines.warn = FALSE)
+      FIELD$author <- Filter(.validAuthor, FIELD$author)
+      DATA <- .merge(DATA, FIELD)
+    }
 
+    # Parameters
+    FILE <- list.files(file.path(PATH), pattern = "_params\\.yml$", recursive = TRUE, full.names = TRUE)
+    if (length(FILE) > 0) {
+      FIELD <- read_yaml(FILE[1], readLines.warn = FALSE)
+      DATA <- .merge(DATA, FIELD)
+    }
 
+    # Format-specific settings
+    FILE <- list.files(file.path(PATH), pattern = "_format\\.yml$", recursive = TRUE, full.names = TRUE)
+    if (length(FILE) > 0) {
+      FIELD <- read_yaml(FILE[1], readLines.warn = FALSE)
+      FIELD$format <- FIELD$format[names(FIELD$format) %in% output_format]
+      if ("els-pdf" %in% output_format && is.null(FIELD$format$`els-pdf`$journal$name)) {
+        FIELD$format$`els-pdf`$journal$name <- gsub(DATA$subtitle, pattern = "\n", replacement = "")
+      }
+      DATA <- .merge(DATA, FIELD)
+    }
+
+    # Styles for DOCX
+    FILE <- list.files(file.path(PATH), pattern = "styles\\.docx$", recursive = TRUE, full.names = TRUE)
+    if (length(FILE) > 0 && "docx" %in% output_format) {
+      FIELD <- list(format = list(docx = list('reference-doc' = FILE[1])))
+      DATA <- .merge(DATA, FIELD)
+    }
+
+    # Styles for HTML
+    FILE <- list.files(file.path(PATH), pattern = "styles\\.css$", recursive = TRUE, full.names = TRUE)
+    if (length(FILE) > 0 && "html" %in% output_format) {
+      FIELD <- list(format = list(html = list(css = FILE[1])))
+      DATA <- .merge(DATA, FIELD)
+    }
 
     # ---------------------------------------------------------------------------
     # LANGUAGE-DEPENDENT STAGE
-    
-    LDATA <- list()
-    # browser()
-    FILE <- list.files(file.path(PATH) ,pattern = "_crossref\\.yml$",recursive = TRUE,full.names = TRUE)
-    if(length(FILE)>0){
-      FIELD <- yaml::read_yaml(FILE[1],readLines.warn=FALSE) ## |> paste(collapse = "\n")
-      LDATA <- c(LDATA,FIELD[[LANG]])
-    } 
-    
-    FILE <- list.files(PATH ,pattern = "_TITLE\\.qmd$",recursive = TRUE,full.names = TRUE)
-    if(length(FILE)>0){
-      VAR <- brio::read_lines(FILE[1]) |> paste(collapse = "\n")
-      FIELD <- list(title=VAR)
-      LDATA <- c(LDATA,FIELD)
+
+    # Cross-references
+    FILE <- list.files(file.path(PATH), pattern = "_crossref\\.yml$", recursive = TRUE, full.names = TRUE)
+    if (length(FILE) > 0) {
+      FIELD <- yaml::read_yaml(FILE[1], readLines.warn = FALSE)
+      LDATA <- .merge(LDATA, FIELD[[LANG]])
     }
-    
-    FILE <- list.files(PATH ,pattern = "_SUBTITLE\\.qmd$",recursive = TRUE,full.names = TRUE)
-    if(length(FILE)>0){
+
+    # Title
+    FILE <- list.files(PATH, pattern = "_TITLE\\.qmd$", recursive = TRUE, full.names = TRUE)
+    if (length(FILE) > 0) {
       VAR <- brio::read_lines(FILE[1]) |> paste(collapse = "\n")
-      FIELD <- list(subtitle=VAR)
-      LDATA <- c(LDATA,FIELD)
+      FIELD <- list(title = VAR)
+      LDATA <- .merge(LDATA, FIELD)
     }
-    
-    FILE <- list.files(PATH ,pattern = "_ABSTRACT\\.qmd$",recursive = TRUE,full.names = TRUE)
-    if(length(FILE)>0){
+
+    # Subtitle
+    FILE <- list.files(PATH, pattern = "_SUBTITLE\\.qmd$", recursive = TRUE, full.names = TRUE)
+    if (length(FILE) > 0) {
       VAR <- brio::read_lines(FILE[1]) |> paste(collapse = "\n")
-      FIELD <- list(abstract=VAR)
-      LDATA <- c(LDATA,FIELD)
-    } 
-    
-    
-    # --------------------------------------------------------------------------
-    FIELD <- list(params=list(
-      background= "white",
-      render="none",
-      ext="png",
-      lang=LANG
+      FIELD <- list(subtitle = VAR)
+      LDATA <- .merge(LDATA, FIELD)
+    }
+
+    # Abstract
+    FILE <- list.files(PATH, pattern = "_ABSTRACT\\.qmd$", recursive = TRUE, full.names = TRUE)
+    if (length(FILE) > 0) {
+      VAR <- brio::read_lines(FILE[1]) |> paste(collapse = "\n")
+      FIELD <- list(abstract = VAR)
+      LDATA <- .merge(LDATA, FIELD)
+    }
+
+    # Additional parameters
+    FIELD <- list(params = list(
+      background = "white",
+      render = "none",
+      ext = "png",
+      lang = LANG
     ))
-    LDATA <- c(LDATA,FIELD)
-    
+    LDATA <- .merge(LDATA, FIELD)
+
     # ---------------------------------------------------------------------------
-    YAML <-yaml::as.yaml(c(DATA,LDATA))
-    TEXT <- YAML |>  gsub(pattern=":\\s*yes($|\\n)", replacement=": true\\1") |> gsub(pattern=":\\s*no($|\\n)", replacement=": false\\1")
-    FILE <- file.path(home_dir,quarto_filename)
-    brio::write_lines(text=TEXT, path=FILE)
-    return()
+    # Combine DATA and LDATA
+    YAML_LIST <- .merge(DATA, LDATA)
+
+    # Convert to YAML
+    YAML <- yaml::as.yaml(YAML_LIST)
+    YAML <- gsub(pattern = ":\\s*yes($|\\n)", replacement = ": true\\1", YAML)
+    YAML <- gsub(pattern = ":\\s*no($|\\n)", replacement = ": false\\1", YAML)
+
+    # Write to file
+    FILE <- file.path(home_dir, quarto_filename)
+    brio::write_lines(text = YAML, path = FILE)
   }
   
   # Post-render function
