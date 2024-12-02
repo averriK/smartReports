@@ -43,6 +43,8 @@
 #' @param point.marker boolean
 #' @param point.dataLabels boolean
 #'
+#' @import ggplot2
+#' @import highcharter
 #' @return plot object
 #' @export buildPlot
 #'

@@ -109,7 +109,7 @@ buildHist2D <- function(data,
   }
   
   # Customize the layout
-  fig <- fig %>% layout(
+  fig <- fig |> layout(
     title = list(text = plot.title, font = list(size = title.fontsize, family = title.font)),
     xaxis = list(title = xAxis.label, tickvals = round(x_vals, x_decimals), tickformat = paste0(".", x_decimals, "f"), titlefont = list(size = axis.fontsize, family = legend.font)),
     yaxis = list(title = yAxis.label, tickvals = round(y_vals, y_decimals), tickformat = paste0(".", y_decimals, "f"), titlefont = list(size = axis.fontsize, family = legend.font)),

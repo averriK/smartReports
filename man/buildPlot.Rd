@@ -17,8 +17,8 @@ buildPlot(
   group.legend = "ID",
   color.palette = NULL,
   plot.type = "line",
-  line.style = NULL,
-  point.style = 16,
+  line.style = "solid",
+  point.style = NULL,
   line.size = 1,
   point.size = 3,
   xAxis.log = FALSE,
@@ -54,7 +54,7 @@ buildPlot(
 
 \item{library}{character c("ggplot2","gg","highcharter","hc","plotly")}
 
-\item{plot.object}{highcharter object}
+\item{plot.object}{highcharter or ggplot2 object}
 
 \item{plot.title}{character}
 
@@ -72,11 +72,11 @@ buildPlot(
 
 \item{color.palette}{character}
 
-\item{plot.type}{character c("line","spline","point","column","bar")}
+\item{plot.type}{character c("line","spline","point","scatter","column","bar")}
 
-\item{line.style}{character c("Solid","Dashed","Dotted", "DashDot","LongDash","LongDashDot","LongDashDotDot")}
+\item{line.style}{character}
 
-\item{point.style}{character c("circle","square","diamond","triangle","triangle-down")}
+\item{point.style}{character or numeric}
 
 \item{line.size}{numeric}
 
@@ -112,7 +112,7 @@ buildPlot(
 
 \item{plot.save}{boolean}
 
-\item{plot.theme}{highcharter object}
+\item{plot.theme}{highcharter or ggplot2 theme object}
 
 \item{xAxis.legend.fontsize}{character}
 
