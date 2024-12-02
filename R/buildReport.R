@@ -130,17 +130,14 @@ buildReport <- function(
     # Styles for DOCX
     FILE <- list.files(file.path(PATH), pattern = "styles\\.docx$", recursive = TRUE, full.names = TRUE)
     if (length(FILE) > 0 && "docx" %in% output_format) {
-      f()
-      # add FILE[1] without path, only filename
-
-      FIELD <- list(format = list(docx = list('reference-doc' = basename(FILE[1]))))
+      FIELD <- list(format = list(docx = list('reference-doc' = FILE[1])))
       DATA <- .merge(DATA, FIELD)
     }
 
     # Styles for HTML
     FILE <- list.files(file.path(PATH), pattern = "styles\\.css$", recursive = TRUE, full.names = TRUE)
     if (length(FILE) > 0 && "html" %in% output_format) {
-      FIELD <- list(format = list(html = list(css = basename(FILE[1]))))
+      FIELD <- list(format = list(html = list(css = FILE[1])))
       DATA <- .merge(DATA, FIELD)
     }
 
