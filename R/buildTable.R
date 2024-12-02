@@ -243,17 +243,17 @@ buildTable <- function(.x,
     kableExtra::kable_styling(full_width = FALSE, position = "center", font_size = font.size.body)
 
   # Header formatting
-  TABLE <- TABLE |>
+  TABLE <- TABLE %>%
     kableExtra::row_spec(0, bold = font.bold.header, font_size = font.size.header, align = align.header, extra_css = paste0("font-family: ", font.family.header, ";"))
 
   # Body formatting
-  TABLE <- TABLE |>
+  TABLE <- TABLE %>%
     kableExtra::row_spec(1:nrow(.x), bold = font.bold.body, align = align.body, extra_css = paste0("font-family: ", font.family.body, ";"))
 
   # Borders
   if (vlines.show || hlines.show) {
     border_styles <- paste0("border: ", hlines.size, "px solid ", hlines.color, ";")
-    TABLE <- TABLE |>
+    TABLE <- TABLE %>%
       kableExtra::row_spec(0, extra_css = border_styles)
   }
 

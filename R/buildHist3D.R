@@ -159,7 +159,7 @@ buildHist3D <- function(data,
   
   
   # Customize the layout for better visualization
-  fig <- fig |> layout(
+  fig <- fig %>% layout(
     scene = list(
       xaxis = list(
         title = list(text = xAxis.label, font = list(size = axis.fontsize, family = legend.font), standoff = 10),  # Set the X axis title
