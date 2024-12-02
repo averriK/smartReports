@@ -98,7 +98,8 @@ buildReport <- function(
 
     # Authors
     FILE <- list.files(file.path(PATH), pattern = "_authors\\.yml$", recursive = TRUE, full.names = TRUE)
-    if (length(FILE) > 0) {
+    has_authors_yml <- length(FILE) > 0
+    if (has_authors_yml) {
       FIELD <- read_yaml(FILE[1], readLines.warn = FALSE)
       FIELD$author <- Filter(.validAuthor, FIELD$author)
       DATA <- .merge(DATA, FIELD)
@@ -108,6 +109,9 @@ buildReport <- function(
     FILE <- list.files(file.path(PATH), pattern = "_params\\.yml$", recursive = TRUE, full.names = TRUE)
     if (length(FILE) > 0) {
       FIELD <- read_yaml(FILE[1], readLines.warn = FALSE)
+      if (has_authors_yml) {
+        FIELD$author <- NULL  # Remove author field if _authors.yml exists
+      }
       DATA <- .merge(DATA, FIELD)
     }
 
