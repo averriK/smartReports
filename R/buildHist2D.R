@@ -31,7 +31,7 @@
 #' @return plotly object
 
 
-hist2D <- function(data, 
+buildHist2D <- function(data, 
                    nbins = 30, 
                    xAxis.label = "x", 
                    yAxis.label = "y", 

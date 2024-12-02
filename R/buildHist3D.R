@@ -31,7 +31,7 @@
 #' @import grDevices
 #'
 #' @return plotly object
-hist3D <- function(data, 
+buildHist3D <- function(data, 
                    nbins = 15, 
                    bin.width = 0.4, 
                    xAxis.label = "x", 

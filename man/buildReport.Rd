@@ -13,7 +13,8 @@ buildReport(
   output_format = c("html", "docx"),
   extensions = c("spl", "bst", "cls", "md", "aux", "log", "tex", "jpg", "sty", "docx",
     "pdf", "html"),
-  postRender = TRUE
+  postRender = TRUE,
+  override = FALSE
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ buildReport(
 \item{extensions}{Extensions to be removed.}
 
 \item{postRender}{Logical. Should post-render be performed?}
+
+\item{override}{Logical. Should the YAML file be overridden if it exists?}
 }
 \description{
 This function builds the Quarto report, handling pre-render and post-render tasks.

@@ -10,7 +10,7 @@
 #' @param output_format Output formats (e.g., 'html', 'docx').
 #' @param extensions Extensions to be removed.
 #' @param postRender Logical. Should post-render be performed?
-#' 
+#' @param override Logical. Should the YAML file be overridden if it exists?
 #' @importFrom utils tail
 #' @import data.table
 #' @import yaml 
@@ -25,14 +25,15 @@ buildReport <- function(
     language = "EN",
     output_format = c("html", "docx"),
     extensions = c("spl", "bst", "cls", "md", "aux", "log", "tex", "jpg", "sty","docx", "pdf", "html"),
-    postRender = TRUE
+    postRender = TRUE,
+    override = FALSE
     
 ) {
   # You can set global variables to NULL to avoid R CMD check warnings
   . <- NULL
   
   # Get package resources path
-  extdata_path <- system.file("extdata", package = "buildReport")
+  extdata_path <- system.file("extdata", package = "smartReports")
   
   if (!dir.exists(build_dir)) {
     
@@ -243,8 +244,8 @@ buildReport <- function(
   tryCatch({
     .preRender()
     
-    # Build the YAML configuration if _quarto.yml does not exist
-    if (!file.exists(file.path(home_dir, quarto_filename))) {
+    # Build the YAML configuration if _quarto.yml does not exist, OR  if file exists and override = TRUE
+    if (!file.exists(file.path(home_dir, quarto_filename)) || override) {
       .buildYAML()
     }
     
