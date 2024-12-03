@@ -4,3 +4,4 @@ devtools::document()
 devtools::check()
 remove.packages("smartReports") |> suppressWarnings()
 devtools::install()
+
