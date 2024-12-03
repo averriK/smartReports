@@ -1,3 +1,4 @@
+# nolint start
 #' Build Plot Function
 #'
 #' A function to create plots using either ggplot2 or highcharter libraries.
@@ -6,16 +7,16 @@
 #' @param ... Additional parameters to customize the plot.
 #' @return A plot object from the specified library.
 #' @export
-#' @importFrom ggplot2 ggplot geom_line geom_smooth geom_point
-#' @importFrom highcharter highchart hc_yAxis hc_xAxis hc_add_theme hc_add_series hc_colors hc_tooltip
+#' @importFrom ggplot2 ggplot geom_line geom_smooth geom_point geom_area geom_text scale_y_log10 scale_x_log10 scale_y_reverse scale_x_reverse ggtitle labs xlab ylab theme theme_blank scale_color_manual scale_fill_manual
+#' @importFrom highcharter highchart hc_yAxis hc_xAxis hc_add_theme hc_add_series hc_colors hc_tooltip hc_legend hc_chart hc_title hc_subtitle hc_size hc_plotOptions hc_annotations
 #' @importFrom ggthemes theme_foundation
 #' @importFrom utils modifyList
-#' @import data.table 
+#' @import data.table
 #' @importFrom grDevices hcl.colors
-#' @import epoxy
+#' @importFrom htmlwidgets saveWidget
 #' @import scales
 #' @import RColorBrewer
-#' 
+
 buildPlot <- function(
   data,
   library = "ggplot2",
@@ -57,18 +58,19 @@ buildPlot <- function(
     legend.align = "right", # c("center", "left", "right")
     legend.valign = "top",  # c("top", "middle", "bottom")
     legend.show = TRUE,
-    plot.save = TRUE,
+    plot.save = FALSE, # Changed to FALSE as default
     plot.theme = NULL,
     xAxis.legend.fontsize = "14px",
     yAxis.legend.fontsize = "14px",
     group.legend.fontsize = "12px",
     plot.title.fontsize = "24px",
     plot.subtitle.fontsize = "18px",
-    print.max.abs = FALSE,
-    fill.polygon = FALSE,
-    fill.group = "",
-    point.marker = FALSE,
-    point.dataLabels = FALSE
+    print.max.abs = FALSE, # Default
+    fill.polygon = FALSE,  # Default
+    fill.group = "ID",       # Default
+    point.marker = TRUE,
+    point.dataLabels = FALSE,
+    plot.filename = NULL  # For saving plots
   )
 
   # Capture user-provided parameters
@@ -94,17 +96,12 @@ buildPlot <- function(
 
   # Map line.style to appropriate values
   line.style.map <- list(
-    "solid" = "Solid",
-    "shortdash" = "ShortDash",
-    "shortdot" = "ShortDot",
-    "shortdashdot" = "ShortDashDot",
-    "shortdashdotdot" = "ShortDashDotDot",
-    "dot" = "Dot",
-    "dash" = "Dash",
-    "longdash" = "LongDash",
-    "dashdot" = "DashDot",
-    "longdashdot" = "LongDashDot",
-    "longdashdotdot" = "LongDashDotDot"
+    "solid" = "solid",
+    "dashed" = "dashed",
+    "dotted" = "dotted",
+    "dotdash" = "dotdash",
+    "longdash" = "longdash",
+    "twodash" = "twodash"
   )
   params$line.style <- line.style.map[[tolower(params$line.style)]] %||% params$line.style
 
@@ -129,7 +126,7 @@ buildPlot <- function(
   # Set default theme if not specified
   if (is.null(params$plot.theme)) {
     if (tolower(library) %in% c("ggplot2", "gg", "ggplot")) {
-      params$plot.theme <- theme_flat()
+      params$plot.theme <- ggthemes::theme_foundation()
     } else if (tolower(library) %in% c("highcharter", "hc", "highchart")) {
       params$plot.theme <- highcharter::hc_theme_flat()
     }
@@ -152,7 +149,7 @@ buildPlot <- function(
 
 # Helper function for ggplot2
 buildPlot.ggplot2 <- function(params) {
-    . <- NULL
+  . <- NULL
   # Extract parameters
   data <- as.data.table(params$data)[, .(ID, X, Y)]
   data[, ID := as.factor(ID)]  # Convert ID to factor
@@ -205,8 +202,26 @@ buildPlot.ggplot2 <- function(params) {
       scale_color_manual(values = COLORS)
   }
 
-  # Additional features (max abs value, fill polygon, etc.)
-  # [Preserve all existing features as in the original code]
+  # Fill polygon
+  if (params$fill.polygon) {
+    PLOT <- PLOT +
+      geom_area(
+        aes_string(fill = params$fill.group),
+        alpha = 0.5
+      ) +
+      scale_fill_manual(values = COLORS)
+  }
+
+  # Print max absolute value
+  if (params$print.max.abs) {
+    data_abs <- data[, .SD[which.max(abs(Y))], by = ID]
+    PLOT <- PLOT +
+      geom_text(
+        data = data_abs,
+        aes(label = paste0("Max Abs: ", round(Y, 2))),
+        vjust = -1
+      )
+  }
 
   # Axis transformations
   if (params$yAxis.log == TRUE) {
@@ -265,6 +280,16 @@ buildPlot.ggplot2 <- function(params) {
   # Apply theme
   PLOT <- PLOT + params$plot.theme
 
+  # Plot Save
+  if (params$plot.save) {
+    ggsave(
+      filename = params$plot.filename %||% "plot.png",
+      plot = PLOT,
+      width = params$plot.width %||% 7,
+      height = params$plot.height %||% 5
+    )
+  }
+
   # Return the plot
   return(PLOT)
 }
@@ -275,29 +300,53 @@ buildPlot.highcharter <- function(params) {
   if (!all(c("ID", "X", "Y") %in% colnames(params$data))) {
     stop("data must contain columns named ID, X, and Y")
   }
-
+  
   data <- params$data
-
+  
+  # Map plot.type to valid Highcharter types
+  plot.type.map <- list(
+    "line" = "line",
+    "spline" = "spline",
+    "area" = "area",
+    "areaspline" = "areaspline",
+    "column" = "column",
+    "bar" = "bar",
+    "scatter" = "scatter",
+    "point" = "scatter"  # Map "point" to "scatter"
+  )
+  params$plot.type <- plot.type.map[[tolower(params$plot.type)]] %||% params$plot.type
+  
+  # Map your line.style to Highcharter's dashStyle directly
+  line.style.map <- list(
+    "solid" = "Solid",
+    "dashed" = "Dash",
+    "dotted" = "Dot",
+    "dotdash" = "DashDot",
+    "longdash" = "LongDash",
+    "twodash" = "Dash",
+    "shortdash" = "ShortDash",
+    "shortdot" = "ShortDot",
+    "shortdashdot" = "ShortDashDot",
+    "longdashdotdot" = "LongDashDotDot"
+  )
+  params$line.style <- line.style.map[[tolower(params$line.style)]] %||% params$line.style
+  
+  # Map your point.style to Highcharter's marker symbols directly
+  point.style.map <- list(
+    "circle" = "circle",
+    "square" = "square",
+    "diamond" = "diamond",
+    "triangle" = "triangle",
+    "triangle-down" = "triangle-down"
+  )
+  params$point.style <- point.style.map[[tolower(params$point.style)]] %||% params$point.style
+  
   # If no existing plot object, create a new highchart object and set axes
   if (is.null(params$plot.object)) {
     PLOT <- highchart()
-
-    # Y-axis settings
-    PLOT <- PLOT |>
-      hc_yAxis(
-        labels = list(enabled = params$yAxis.label),
-        title = list(
-          text = params$yAxis.legend,
-          style = list(fontSize = params$yAxis.legend.fontsize)
-        ),
-        type = if (params$yAxis.log) "logarithmic" else "linear",
-        reversed = params$yAxis.reverse,
-        max = if (!is.na(params$yAxis.max)) params$yAxis.max else NULL,
-        min = if (!is.na(params$yAxis.min)) params$yAxis.min else NULL
-      )
-
+    
     # X-axis settings
-    PLOT <- PLOT |>
+    PLOT <- PLOT %>%
       hc_xAxis(
         labels = list(enabled = params$xAxis.label),
         title = list(
@@ -309,62 +358,110 @@ buildPlot.highcharter <- function(params) {
         max = if (!is.na(params$xAxis.max)) params$xAxis.max else NULL,
         min = if (!is.na(params$xAxis.min)) params$xAxis.min else NULL
       )
-
+    
+    # Y-axis settings
+    PLOT <- PLOT %>%
+      hc_yAxis(
+        labels = list(enabled = params$yAxis.label),
+        title = list(
+          text = params$yAxis.legend,
+          style = list(fontSize = params$yAxis.legend.fontsize)
+        ),
+        type = if (params$yAxis.log) "logarithmic" else "linear",
+        reversed = params$yAxis.reverse,
+        max = if (!is.na(params$yAxis.max)) params$yAxis.max else NULL,
+        min = if (!is.na(params$yAxis.min)) params$yAxis.min else NULL
+      )
+    
     # Apply theme
-    PLOT <- PLOT |>
+    PLOT <- PLOT %>%
       hc_add_theme(hc_thm = params$plot.theme)
+    
+    # Titles
+    if (!is.null(params$plot.title)) {
+      PLOT <- PLOT %>%
+        hc_title(
+          text = params$plot.title,
+          style = list(fontSize = params$plot.title.fontsize)
+        )
+    }
+    if (!is.null(params$plot.subtitle)) {
+      PLOT <- PLOT %>%
+        hc_subtitle(
+          text = params$plot.subtitle,
+          style = list(fontSize = params$plot.subtitle.fontsize)
+        )
+    }
+    
+    # Plot size
+    if (!is.null(params$plot.height) || !is.null(params$plot.width)) {
+      PLOT <- PLOT %>%
+        hc_size(height = params$plot.height, width = params$plot.width)
+    }
+    
+    # Legend settings
+    PLOT <- PLOT %>%
+      hc_legend(
+        enabled = params$legend.show,
+        align = params$legend.align,
+        verticalAlign = params$legend.valign,
+        layout = params$legend.layout,
+        itemStyle = list(fontSize = params$group.legend.fontsize)
+      ) %>%
+      hc_chart(style = list(fontFamily = "Helvetica"))
   } else {
     # Use the existing plot object
     PLOT <- params$plot.object
   }
-
+  
   # Generate colors
   NID <- length(unique(data$ID))
   COLORS <- grDevices::hcl.colors(n = NID, palette = params$color.palette)
-
-  # Map line.style to Highcharter's accepted values
-  line.style.map <- list(
-    "solid" = "Solid",
-    "shortdash" = "ShortDash",
-    "shortdot" = "ShortDot",
-    "shortdashdot" = "ShortDashDot",
-    "shortdashdotdot" = "ShortDashDotDot",
-    "dot" = "Dot",
-    "dash" = "Dash",
-    "longdash" = "LongDash",
-    "dashdot" = "DashDot",
-    "longdashdot" = "LongDashDot",
-    "longdashdotdot" = "LongDashDotDot"
-  )
-  params$line.style <- line.style.map[[tolower(params$line.style)]] %||% params$line.style
-
-  # Add series using params$plot.type directly
-  PLOT <- PLOT |>
-    hc_add_series(
-      data = data,
-      type = params$plot.type,
-      dashStyle = params$line.style,
-      lineWidth = params$line.size,
-      marker = list(
-        symbol = params$point.style.highcharter,
-        radius = params$point.size,
-        enabled = tolower(params$plot.type) %in% c("point", "scatter") || params$point.marker
-      ),
-      hcaes(x = X, y = Y, group = ID),
-      colorByPoint = FALSE
+  
+  # Handle fill.polygon for area charts
+  if (params$fill.polygon && params$plot.type %in% c("line", "spline")) {
+    # Switch to area chart if fill.polygon is TRUE
+    params$plot.type <- ifelse(params$plot.type == "line", "area", "areaspline")
+  }
+  
+  # Construct arguments for hc_add_series
+  series_args <- list(
+    data = data,
+    type = params$plot.type,
+    hcaes(x = X, y = Y, group = ID),
+    colorByPoint = FALSE,
+    marker = list(
+      enabled = if (params$plot.type == "scatter") TRUE else params$point.marker,
+      symbol = params$point.style,    # Use params$point.style directly
+      radius = params$point.size
     )
-
+  )
+  
+  # Include line styling only for appropriate plot types
+  if (params$plot.type %in% c("line", "spline", "area", "areaspline")) {
+    series_args$dashStyle <- params$line.style  # Use params$line.style directly
+    series_args$lineWidth <- params$line.size
+  }
+  
+  # Set fillOpacity for area charts when fill.polygon is TRUE
+  if (params$plot.type %in% c("area", "areaspline")) {
+    series_args$fillOpacity <- if (params$fill.polygon) 0.5 else 1
+  }
+  
+  # Add series to the plot
+  PLOT <- PLOT %>%
+    do.call(hc_add_series, series_args)
+  
   # Tooltip settings
-  # Construct TIP without evaluating {point.ID}
   TIP <- paste0(
     "<b>{point.ID}</b><br>",
     params$xAxis.legend, ": {point.x}<br>",
     params$yAxis.legend, ": {point.y}"
   )
-
+  
   # Apply colors and tooltip
-  PLOT <- PLOT |>
-    hc_colors(colors = COLORS) |>
+  PLOT <- PLOT %>%
+    hc_colors(colors = COLORS) %>%
     hc_tooltip(
       sort = FALSE,
       split = FALSE,
@@ -372,79 +469,43 @@ buildPlot.highcharter <- function(params) {
       headerFormat = "",
       pointFormat = TIP
     )
-
-  # Only apply legend settings when creating a new plot
-  if (is.null(params$plot.object)) {
-    # Legend settings
-    PLOT <- PLOT |>
-      hc_legend(
-        enabled = params$legend.show,
-        align = params$legend.align,
-        verticalAlign = params$legend.valign,
-        layout = params$legend.layout,
-        itemStyle = list(fontSize = params$group.legend.fontsize)
-      ) |>
-      hc_chart(style = list(fontFamily = "Helvetica"))
-
-    # Titles
-    if (!is.null(params$plot.title)) {
-      PLOT <- PLOT |>
-        hc_title(
-          text = params$plot.title,
-          style = list(fontSize = params$plot.title.fontsize)
-        )
-    }
-
-    if (!is.null(params$plot.subtitle)) {
-      PLOT <- PLOT |>
-        hc_subtitle(
-          text = params$plot.subtitle,
-          style = list(fontSize = params$plot.subtitle.fontsize)
-        )
-    }
-
-    # Plot size
-    if (!is.null(params$plot.height) || !is.null(params$plot.width)) {
-      PLOT <- PLOT |>
-        hc_size(height = params$plot.height, width = params$plot.width)
-    }
-  }
-
+  
   # Plot options
-  PLOT <- PLOT |>
+  PLOT <- PLOT %>%
     hc_plotOptions(
       series = list(
-        dataLabels = list(enabled = params$point.dataLabels),
-        marker = list(
-          enabled = params$point.marker,
-          radius = params$point.size
-        )
+        dataLabels = list(enabled = params$point.dataLabels)
       )
     )
-
+  
+  # Print max absolute value using annotations
+  if (params$print.max.abs) {
+    data_abs <- data[, .SD[which.max(abs(Y))], by = ID]
+    PLOT <- PLOT %>%
+      hc_annotations(
+        list(
+          labels = lapply(1:nrow(data_abs), function(i) {
+            list(
+              point = list(
+                xAxis = 0, yAxis = 0,
+                x = data_abs$X[i], y = data_abs$Y[i]
+              ),
+              text = paste0("Max Abs: ", round(data_abs$Y[i], 2))
+            )
+          })
+        )
+      )
+  }
+  
+  # Plot Save
+  if (params$plot.save) {
+    htmlwidgets::saveWidget(
+      widget = PLOT,
+      file = params$plot.filename %||% "plot.html"
+    )
+  }
+  
   # Return the plot
   return(PLOT)
 }
-
-# Custom theme for ggplot2
-theme_flat <- function() {
-  ggthemes::theme_foundation() +
-    theme(
-      plot.background = element_rect(fill = "#ECF0F1", color = NA),
-      panel.background = element_rect(fill = "#ECF0F1", color = NA),
-      panel.grid.major = element_line(color = "#BDC3C7",  size = 0.3),
-      panel.grid.minor = element_line(color = "#BDC3C7", size = 0.1),
-      axis.line.x = element_line(color = "#BDC3C7"),
-      axis.line.y = element_line(color = "#BDC3C7"),
-      axis.ticks.x = element_line(color = "#BDC3C7"),
-      axis.ticks.y = element_line(color = "#BDC3C7"),
-      axis.text = element_text(color = "#34495e"),
-      axis.title = element_text(color = "#34495e", face = "bold"),
-      plot.title = element_text(color = "#34495e", face = "bold", hjust = 0.5),
-      plot.subtitle = element_text(color = "#34495e", hjust = 0.5),
-      legend.background = element_rect(fill = alpha("black", 0.1), color = NA),
-      legend.key = element_rect(fill = alpha("black", 0.5), color = NA),
-      legend.text = element_text(color = "#34495e"),
-      legend.title = element_text(color = "#34495e", face = "bold")
-    )
-}
+# nolint end

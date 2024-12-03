@@ -24,7 +24,8 @@ Imports:
     epoxy,
     htmlwidgets,
     webshot2,
-    scales
+    scales,
+    plotly
 Suggests:
     devtools,
     roxygen2,
