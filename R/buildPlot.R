@@ -6,12 +6,12 @@
 #' @param ... Additional parameters to customize the plot.
 #' @return A plot object from the specified library.
 #' @export
-#' @import ggplot2
-#' @import highcharter
-#' @import ggthemes
-#' @import utils
-#' @import data.table
-#' @import grDevices
+#' @importFrom ggplot2 ggplot geom_line geom_smooth geom_point
+#' @importFrom highcharter highchart hc_yAxis hc_xAxis hc_add_theme hc_add_series hc_colors hc_tooltip
+#' @importFrom ggthemes theme_foundation
+#' @importFrom utils modifyList
+#' @import data.table 
+#' @importFrom grDevices hcl.colors
 #' @import epoxy
 #' @import scales
 #' @import RColorBrewer
