@@ -25,6 +25,8 @@ Imports:
     htmlwidgets,
     webshot2,
     scales,
+    stats,
+    graphics,
     plotly
 Suggests:
     devtools,
