@@ -21,7 +21,6 @@ Imports:
     grDevices,
     RColorBrewer,
     highcharter,
-    epoxy,
     htmlwidgets,
     webshot2,
     scales,

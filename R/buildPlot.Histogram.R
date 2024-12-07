@@ -10,7 +10,7 @@
 #' @import data.table
 #' @importFrom stats quantile density
 #' @importFrom graphics hist
-#' @importFrom highcharter hc_add_theme hc_theme_flat hc_chart hc_title hc_xAxis hc_yAxis hc_legend hc_plotOptions hc_add_series
+#' @import highcharter
 #' @return A highchart object representing the histogram plot.
 #' 
 buildPlot.Histogram <- function(.data, xTitle = "", title = "", 
@@ -38,13 +38,13 @@ buildPlot.Histogram <- function(.data, xTitle = "", title = "",
                      all_range[2] + 0.1 * range_width)
   
   # Create base plot with consistent theme and extended x-axis range
-  .p <- highchart() %>%
-    hc_add_theme(hc_theme_flat()) %>%
+  .p <- highchart() |>
+    hc_add_theme(hc_theme_flat()) |>
     hc_chart(
       style = list(fontFamily = "Arial"),
       backgroundColor = "#FFFFFF"
-    ) %>%
-    hc_title(text = title) %>%
+    ) |>
+    hc_title(text = title) |>
     hc_xAxis(
       title = list(text = if(logscale) paste(xTitle, "(log scale)") else xTitle),
       type = if(logscale) "logarithmic" else "linear",
@@ -56,7 +56,7 @@ buildPlot.Histogram <- function(.data, xTitle = "", title = "",
       gridLineColor = "#E0E0E0",
       minorGridLineWidth = 0,
       tickLength = 5
-    ) %>%
+    ) |>
     hc_yAxis(
       title = list(text = "Count"),
       lineWidth = 1,
@@ -65,7 +65,7 @@ buildPlot.Histogram <- function(.data, xTitle = "", title = "",
       gridLineColor = "#E0E0E0",
       minorGridLineWidth = 0,
       tickLength = 5
-    ) %>%
+    ) |>
     hc_legend(
       layout = "vertical",
       align = "right",
@@ -75,7 +75,7 @@ buildPlot.Histogram <- function(.data, xTitle = "", title = "",
         fontWeight = "normal",
         fontFamily = "Arial"
       )
-    ) %>%
+    ) |>
     hc_plotOptions(
       column = list(
         grouping = FALSE,
@@ -104,7 +104,7 @@ buildPlot.Histogram <- function(.data, xTitle = "", title = "",
     }
     
     # Add histogram series
-    .p <- .p %>%
+    .p <- .p |>
       hc_add_series(
         name = paste(.groups[i], "Histogram"),
         data = .hist_series,
@@ -149,7 +149,7 @@ buildPlot.Histogram <- function(.data, xTitle = "", title = "",
   
   for (i in seq_along(.groups)) {
     group_data <- density_list[ID == .groups[i]]
-    .p <- .p %>% 
+    .p <- .p |> 
       hc_add_series(
         data = list_parse2(data.table(x = group_data$x, y = group_data$y)),
         name = paste(.groups[i], "Density"),
@@ -169,7 +169,7 @@ buildPlot.Histogram <- function(.data, xTitle = "", title = "",
     stats <- as.list(quantile(group_data$X, probs = c(0.05, 0.10, 0.16, 0.50, 0.84, 0.90, 0.95)))
     
     # Add median as a special point
-    .p <- .p %>%
+    .p <- .p |>
       hc_add_series(
         data = list(list(
           x = stats[[4]], 
@@ -194,7 +194,7 @@ buildPlot.Histogram <- function(.data, xTitle = "", title = "",
     
     # Add other quantiles
     quantile_names <- c("5%", "10%", "16%", "84%", "90%", "95%")
-    .p <- .p %>%
+    .p <- .p |>
       hc_add_series(
         data = list(
           list(x = stats[[1]], y = 0, name = "5th percentile", value = round(stats[[1]], 4)),

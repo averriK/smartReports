@@ -10,15 +10,15 @@
 #' @param line.width The width of the line.
 #' @param point.size The size of the points.
 #' @param point.shape The shape of the points.
-#' @importFrom highcharter hc_add_theme hc_theme_flat hc_chart hc_title hc_xAxis hc_yAxis hc_legend hc_plotOptions hc_add_series
+#' @import highcharter
 #' @return A highchart object representing the model plot.  
 #' 
 buildPlot.Model <- function(data.lines, data.points, xAxis.legend, yAxis.legend, 
                          line.width = 1.5, point.size = 2, point.shape = "circle") {
   
-  PLOT <- highchart() %>%
-    hc_add_theme(hc_theme_flat()) %>%
-    hc_chart(zoomType = "xy") %>%
+  PLOT <- highchart() |>
+    hc_add_theme(hc_theme_flat()) |>
+    hc_chart(zoomType = "xy") |>
     hc_xAxis(
       type = "logarithmic",
       title = list(text = xAxis.legend),
@@ -27,7 +27,7 @@ buildPlot.Model <- function(data.lines, data.points, xAxis.legend, yAxis.legend,
       minorGridLineWidth = 0.3,
       gridLineWidth = 0.5,
       minorTickInterval = "auto"
-    ) %>%
+    ) |>
     hc_yAxis(
       type = "logarithmic",
       title = list(text = yAxis.legend),
@@ -36,7 +36,7 @@ buildPlot.Model <- function(data.lines, data.points, xAxis.legend, yAxis.legend,
       minorGridLineWidth = 0.3,
       gridLineWidth = 0.5,
       minorTickInterval = "auto"
-    ) %>%
+    ) |>
     hc_legend(
       layout = "vertical",
       align = "right",
@@ -49,7 +49,7 @@ buildPlot.Model <- function(data.lines, data.points, xAxis.legend, yAxis.legend,
     )
   
   if (!is.null(data.lines)) {
-    PLOT <- PLOT %>% 
+    PLOT <- PLOT |> 
       hc_add_series(
         data = data.lines,
         type = "spline",
@@ -60,7 +60,7 @@ buildPlot.Model <- function(data.lines, data.points, xAxis.legend, yAxis.legend,
   }
   
   if (!is.null(data.points)) {
-    PLOT <- PLOT %>% 
+    PLOT <- PLOT |> 
       hc_add_series(
         data = data.points,
         type = "scatter",

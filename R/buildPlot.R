@@ -7,8 +7,8 @@
 #' @param ... Additional parameters to customize the plot.
 #' @return A plot object from the specified library.
 #' @export
-#' @importFrom ggplot2 ggplot geom_line geom_smooth geom_point geom_area geom_text scale_y_log10 scale_x_log10 scale_y_reverse scale_x_reverse ggtitle labs xlab ylab theme theme_blank scale_color_manual scale_fill_manual
-#' @importFrom highcharter highchart hc_yAxis hc_xAxis hc_add_theme hc_add_series hc_colors hc_tooltip hc_legend hc_chart hc_title hc_subtitle hc_size hc_plotOptions hc_annotations
+#' @import ggplot2
+#' @import highcharter
 #' @importFrom ggthemes theme_foundation
 #' @importFrom utils modifyList
 #' @import data.table
@@ -346,7 +346,7 @@ buildPlot.highcharter <- function(params) {
     PLOT <- highchart()
     
     # X-axis settings
-    PLOT <- PLOT %>%
+    PLOT <- PLOT |>
       hc_xAxis(
         labels = list(enabled = params$xAxis.label),
         title = list(
@@ -360,7 +360,7 @@ buildPlot.highcharter <- function(params) {
       )
     
     # Y-axis settings
-    PLOT <- PLOT %>%
+    PLOT <- PLOT |>
       hc_yAxis(
         labels = list(enabled = params$yAxis.label),
         title = list(
@@ -374,19 +374,19 @@ buildPlot.highcharter <- function(params) {
       )
     
     # Apply theme
-    PLOT <- PLOT %>%
+    PLOT <- PLOT |>
       hc_add_theme(hc_thm = params$plot.theme)
     
     # Titles
     if (!is.null(params$plot.title)) {
-      PLOT <- PLOT %>%
+      PLOT <- PLOT |>
         hc_title(
           text = params$plot.title,
           style = list(fontSize = params$plot.title.fontsize)
         )
     }
     if (!is.null(params$plot.subtitle)) {
-      PLOT <- PLOT %>%
+      PLOT <- PLOT |>
         hc_subtitle(
           text = params$plot.subtitle,
           style = list(fontSize = params$plot.subtitle.fontsize)
@@ -395,19 +395,19 @@ buildPlot.highcharter <- function(params) {
     
     # Plot size
     if (!is.null(params$plot.height) || !is.null(params$plot.width)) {
-      PLOT <- PLOT %>%
+      PLOT <- PLOT |>
         hc_size(height = params$plot.height, width = params$plot.width)
     }
     
     # Legend settings
-    PLOT <- PLOT %>%
+    PLOT <- PLOT |>
       hc_legend(
         enabled = params$legend.show,
         align = params$legend.align,
         verticalAlign = params$legend.valign,
         layout = params$legend.layout,
         itemStyle = list(fontSize = params$group.legend.fontsize)
-      ) %>%
+      ) |>
       hc_chart(style = list(fontFamily = "Helvetica"))
   } else {
     # Use the existing plot object
@@ -449,7 +449,7 @@ buildPlot.highcharter <- function(params) {
   }
   
   # Add series to the plot
-  PLOT <- PLOT %>%
+  PLOT <- PLOT |>
     do.call(hc_add_series, series_args)
   
   # Tooltip settings
@@ -460,8 +460,8 @@ buildPlot.highcharter <- function(params) {
   )
   
   # Apply colors and tooltip
-  PLOT <- PLOT %>%
-    hc_colors(colors = COLORS) %>%
+  PLOT <- PLOT |>
+    hc_colors(colors = COLORS) |>
     hc_tooltip(
       sort = FALSE,
       split = FALSE,
@@ -471,7 +471,7 @@ buildPlot.highcharter <- function(params) {
     )
   
   # Plot options
-  PLOT <- PLOT %>%
+  PLOT <- PLOT |>
     hc_plotOptions(
       series = list(
         dataLabels = list(enabled = params$point.dataLabels)
@@ -481,7 +481,7 @@ buildPlot.highcharter <- function(params) {
   # Print max absolute value using annotations
   if (params$print.max.abs) {
     data_abs <- data[, .SD[which.max(abs(Y))], by = ID]
-    PLOT <- PLOT %>%
+    PLOT <- PLOT |>
       hc_annotations(
         list(
           labels = lapply(1:nrow(data_abs), function(i) {
