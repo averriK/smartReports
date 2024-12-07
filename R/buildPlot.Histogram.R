@@ -12,7 +12,7 @@
 #' @importFrom graphics hist
 #' @import highcharter
 #' @return A highchart object representing the histogram plot.
-#' 
+#' @export buildPlot.Histogram
 buildPlot.Histogram <- function(.data, xTitle = "", title = "", 
                                     histogram.breaks = 100, logscale = FALSE) {
   

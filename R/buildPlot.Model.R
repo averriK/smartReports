@@ -12,7 +12,7 @@
 #' @param point.shape The shape of the points.
 #' @import highcharter
 #' @return A highchart object representing the model plot.  
-#' 
+#' @export buildPlot.Model
 buildPlot.Model <- function(data.lines, data.points, xAxis.legend, yAxis.legend, 
                          line.width = 1.5, point.size = 2, point.shape = "circle") {
   
