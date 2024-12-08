@@ -186,10 +186,13 @@ buildReport <- function(
 
     # ---------------------------------------------------------------------------
     # Combine DATA and LDATA
-    YAML_LIST <- .merge(DATA, LDATA)
+    DATA <- .merge(DATA, LDATA)
+
+    # Filter formats
+    DATA$format <- DATA$format[names(DATA$format) %in% output_format]
 
     # Convert to YAML
-    YAML <- yaml::as.yaml(YAML_LIST)
+    YAML <- yaml::as.yaml(DATA)
     YAML <- gsub(pattern = ":\\s*yes($|\\n)", replacement = ": true\\1", YAML)
     YAML <- gsub(pattern = ":\\s*no($|\\n)", replacement = ": false\\1", YAML)
 
