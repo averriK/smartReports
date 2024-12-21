@@ -7,14 +7,18 @@
 #' @param title The main title for the plot.
 #' @param histogram.breaks The number of breaks for the histogram.
 #' @param logscale Logical, whether to use a logarithmic scale for the x-axis.
+#' @param offset The percentage of the range to extend the x-axis.
 #' @import data.table
 #' @importFrom stats quantile density
 #' @importFrom graphics hist
 #' @import highcharter
 #' @return A highchart object representing the histogram plot.
 #' @export buildPlot.Histogram
+
+
+
 buildPlot.Histogram <- function(.data, xTitle = "", title = "", 
-                                    histogram.breaks = 100, logscale = FALSE) {
+                                histogram.breaks = 100, logscale = FALSE, offset = 0.1) {
   
   # Get unique groups
   .groups <- unique(.data$ID)
@@ -33,9 +37,23 @@ buildPlot.Histogram <- function(.data, xTitle = "", title = "",
   }
   
   # Calculate extended range for consistent x-axis
-  range_width <- diff(all_range)
-  extended_range <- c(all_range[1] - 0.1 * range_width,
-                     all_range[2] + 0.1 * range_width)
+  if(logscale) {
+    # Work in log space to adjust the range proportionally
+    log_all_range <- log10(all_range)
+    range_width <- diff(log_all_range)
+    extended_log_range <- c(
+      log_all_range[1] - offset * range_width,
+      log_all_range[2] + offset * range_width
+    )
+    # Convert back to original scale
+    extended_range <- 10 ^ extended_log_range
+  } else {
+    range_width <- diff(all_range)
+    extended_range <- c(
+      all_range[1] - offset * range_width,
+      all_range[2] + offset * range_width
+    )
+  }
   
   # Create base plot with consistent theme and extended x-axis range
   .p <- highchart() |>
@@ -121,31 +139,58 @@ buildPlot.Histogram <- function(.data, xTitle = "", title = "",
     full_range <- range(.data$X)
     range_width <- diff(full_range)
     extended_range <- c(full_range[1] - 0.1 * range_width,
-                       full_range[2] + 0.1 * range_width)
+                        full_range[2] + 0.1 * range_width)
     
     if(logscale) {
-      dens <- density(log10(X), from = log10(extended_range[1]), 
-                     to = log10(extended_range[2]), n = 512)
-    } else {
-      dens <- density(X, from = extended_range[1], 
-                     to = extended_range[2], n = 512)
-    }
-    
-    # Calculate histogram with same breaks as main plot for proper scaling
-    if(logscale) {
-      .hist <- hist(log10(X), breaks = log10(common_breaks), plot = FALSE)
-      scale_factor <- max(.hist$counts) / max(dens$y)
+      # Filter positive X values
+      X_pos <- X[X > 0]
+      
+      # Adjust extended_range for densities
+      min_positive <- min(X_pos, na.rm = TRUE)
+      if (is.infinite(min_positive)) {
+        stop("Data contains no positive values, cannot compute density")
+      }
+      full_range <- range(X_pos)
+      full_range[1] <- max(full_range[1], min_positive / 10)
+      
+      log_full_range <- log10(full_range)
+      range_width <- diff(log_full_range)
+      extended_log_range <- c(
+        log_full_range[1] - offset * range_width,
+        log_full_range[2] + offset * range_width
+      )
+      extended_range <- 10 ^ extended_log_range
+      
+      # Ensure extended_range[1] is positive
+      if(extended_range[1] <= 0) {
+        extended_range[1] <- full_range[1] / 10
+        extended_log_range[1] <- log10(extended_range[1])
+      }
+      
+      dens <- density(log10(X_pos), from = extended_log_range[1], 
+                      to = extended_log_range[2], n = 512)
+      
+      # Calculate histogram with same breaks as main plot for proper scaling
+      .hist <- hist(log10(X_pos), breaks = log10(common_breaks), plot = FALSE)
+      scale_factor <- max(.hist$counts) / max(dens$y, na.rm = TRUE)
       list(x = 10^dens$x, y = dens$y * scale_factor)
     } else {
+      # Original code for linear scale
+      full_range <- range(X)
+      range_width <- diff(full_range)
+      extended_range <- c(full_range[1] - offset * range_width,
+                          full_range[2] + offset * range_width)
+      dens <- density(X, from = extended_range[1], 
+                      to = extended_range[2], n = 512)
       .hist <- hist(X, breaks = common_breaks, plot = FALSE)
-      scale_factor <- max(.hist$counts) / max(dens$y)
+      scale_factor <- max(.hist$counts) / max(dens$y, na.rm = TRUE)
       list(x = dens$x, y = dens$y * scale_factor)
     }
   }, by = ID]
   
   # Define density colors (slightly different than histogram colors)
   .density_palette <- c("#7AA6FF", "#FFB07A", "#90E088", "#FF8A8A", "#BE99E3", 
-                         "#A6E4FF", "#FFD7C6", "#B3B3B3", "#D9FF5C", "#A6E4FF")
+                        "#A6E4FF", "#FFD7C6", "#B3B3B3", "#D9FF5C", "#A6E4FF")
   
   for (i in seq_along(.groups)) {
     group_data <- density_list[ID == .groups[i]]
@@ -222,3 +267,5 @@ buildPlot.Histogram <- function(.data, xTitle = "", title = "",
   
   return(.p)
 }
+
+# nolint end

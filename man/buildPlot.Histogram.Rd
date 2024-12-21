@@ -9,7 +9,8 @@ buildPlot.Histogram(
   xTitle = "",
   title = "",
   histogram.breaks = 100,
-  logscale = FALSE
+  logscale = FALSE,
+  offset = 0.1
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ buildPlot.Histogram(
 \item{histogram.breaks}{The number of breaks for the histogram.}
 
 \item{logscale}{Logical, whether to use a logarithmic scale for the x-axis.}
+
+\item{offset}{The percentage of the range to extend the x-axis.}
 }
 \value{
 A highchart object representing the histogram plot.

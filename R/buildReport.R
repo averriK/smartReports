@@ -189,7 +189,9 @@ buildReport <- function(
     DATA <- .merge(DATA, LDATA)
 
     # Filter formats
-    DATA$format <- DATA$format[names(DATA$format) %in% output_format]
+    if (!is.null(DATA$format)) {
+        DATA$format <- DATA$format[names(DATA$format) %in% output_format]
+    }
 
     # Convert to YAML
     YAML <- yaml::as.yaml(DATA)
@@ -252,9 +254,11 @@ buildReport <- function(
       .buildYAML()
     }
     
-    # Render the Quarto document
-    # browser()
-    quarto::quarto_render(input = file.path(home_dir, index_filename))
+    # Render the Quarto document, specifying to render all formats
+    quarto::quarto_render(
+        input = file.path(home_dir, index_filename),
+        output_format = "all"
+    )
     
     # Call postRender() function
     if(postRender) .postRender()
