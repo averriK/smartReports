@@ -93,7 +93,6 @@ buildPlot <- function(
   plot.filename = NULL,
   ...
 ) {
-
   # Soft check if both data.lines and data.points are NULL
   if (is.null(data.lines) && is.null(data.points)) {
     warning("No data provided for lines or points. Returning NULL.")
@@ -138,53 +137,47 @@ buildPlot <- function(
     "triangle-down" = "triangle-down"
   )
 
-  # Pre-check line.type (should be "line" or "spline")
-  # We'll later convert to area/areaspline if fill is TRUE at the group level
+  # Validate line.type
   line.type <- tolower(line.type)
   if (!(line.type %in% c("line", "spline"))) {
     warning(sprintf("Provided line.type='%s' is invalid. Using 'line' by default.", line.type))
     line.type <- "line"
   }
 
-  # If we have data.lines, ensure it has X, Y, ID
-  if (!is.null(data.lines)) {
-    needed_cols <- c("ID", "X", "Y")
-    if (!all(needed_cols %in% colnames(data.lines))) {
-      stop("data.lines must contain columns named ID, X, and Y if not NULL.")
-    }
-    if (!is.numeric(data.lines$Y)) {
-      stop("Error in buildPlot.highchart(): data.lines$Y must be numeric.")
-    }
-  }
-
-  # If we have data.points, ensure it has X, Y, ID
-  if (!is.null(data.points)) {
-    needed_cols <- c("ID", "X", "Y")
-    if (!all(needed_cols %in% colnames(data.points))) {
-      stop("data.points must contain columns named ID, X, and Y if not NULL.")
-    }
-    if (!is.numeric(data.points$Y)) {
-      stop("Error in buildPlot.highchart(): data.points$Y must be numeric.")
+  # Validate data inputs
+  validate_data <- function(data, data_name) {
+    if (!is.null(data)) {
+      needed_cols <- c("ID", "X", "Y")
+      if (!all(needed_cols %in% colnames(data))) {
+        stop(sprintf("%s must contain columns named ID, X, and Y if not NULL.", data_name))
+      }
+      if (!is.numeric(data$Y)) {
+        stop(sprintf("Error in buildPlot.highchart(): %s$Y must be numeric.", data_name))
+      }
     }
   }
 
-  # =====================
-  # Gather IDs for color
-  # =====================
-  line_ids  <- if (!is.null(data.lines))  unique(data.lines$ID)  else character(0)
-  point_ids <- if (!is.null(data.points)) unique(data.points$ID) else character(0)
-  all_ids   <- unique(c(line_ids, point_ids))
+  validate_data(data.lines, "data.lines")
+  validate_data(data.points, "data.points")
 
-  # Create a color mapping for consistent coloring across lines & points
-  NID <- length(all_ids)
-  COLORS <- grDevices::hcl.colors(n = NID, palette = color.palette)
-  id_color_map <- stats::setNames(COLORS, all_ids)
+  # Create color mapping
+  COLORS <- grDevices::hcl.colors(
+    n = length(unique(c(
+      if (!is.null(data.lines)) unique(data.lines$ID) else character(0),
+      if (!is.null(data.points)) unique(data.points$ID) else character(0)
+    ))), 
+    palette = color.palette
+  )
+  id_color_map <- stats::setNames(
+    COLORS, 
+    unique(c(
+      if (!is.null(data.lines)) unique(data.lines$ID) else character(0),
+      if (!is.null(data.points)) unique(data.points$ID) else character(0)
+    ))
+  )
 
-  # Create new highchart (libraries are not called here, as this is part of a package)
-  PLOT <- highchart()
-
-  # X-axis settings
-  PLOT <- PLOT |>
+  # Initialize highchart plot
+  PLOT <- highchart() |>
     hc_xAxis(
       labels = list(enabled = xAxis.label),
       title = list(
@@ -196,7 +189,6 @@ buildPlot <- function(
       max = if (!is.na(xAxis.max)) xAxis.max else NULL,
       min = if (!is.na(xAxis.min)) xAxis.min else NULL
     ) |>
-    # Y-axis settings
     hc_yAxis(
       labels = list(enabled = yAxis.label),
       title = list(
@@ -209,11 +201,11 @@ buildPlot <- function(
       min = if (!is.na(yAxis.min)) yAxis.min else NULL
     )
 
-  # Add theme if provided
+  # Theme handling
   if (!is.null(plot.theme)) {
     PLOT <- PLOT |> hc_add_theme(plot.theme)
   } else {
-    PLOT <- PLOT |> hc_add_theme(hc_theme_flat())
+    PLOT <- PLOT  |> hc_add_theme(hc_theme_flat())
   }
 
   # Titles
