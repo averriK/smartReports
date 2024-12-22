@@ -7,7 +7,7 @@ library(data.table)
 library(highcharter)
 # Force numeric columns to avoid any non-numeric issues
 data.lines <- data.table(
-  ID    = rep(c("Line A", "Line B", "Line C"), each = 5),
+  ID    = rep(c("A", "B", "C"), each = 5),
   X     = as.numeric(rep(1:5, 3)),
   Y     = as.numeric(c(seq(1, 5), seq(2, 6), seq(3, 7))),
   style = c(rep("solid", 5), rep("dotted", 5), rep("dashed", 5)),
@@ -15,7 +15,7 @@ data.lines <- data.table(
 )
 
 data.points <- data.table(
-  ID    = rep(c("Points A", "Points B", "Points C"), each = 4),
+  ID    = rep(c("A", "B", "C"), each = 4),
   X     = as.numeric(rep(1:4, 3)),
   Y     = as.numeric(c(seq(8, 11), seq(6, 9), seq(4, 7))),
   style = c(rep("circle", 4), rep("diamond", 4), rep("triangle-down", 4))
@@ -24,7 +24,7 @@ data.points <- data.table(
 # Now call your buildPlot.highchart function
 # Setting line.type to "spline" for curved lines
 # and toggling print.max.abs to show an annotation of max absolute Y for each ID
-plot_obj <- buildPlot(Model,
+PLOT <- buildPlot(
   data.lines      = data.lines,
   data.points     = data.points,
   line.type       = "spline", 
@@ -34,11 +34,11 @@ plot_obj <- buildPlot(Model,
   plot.width      = 700,
   xAxis.legend    = "Time (units)",
   yAxis.legend    = "Value",
-  print.max.abs   = TRUE
+  print.max.abs   = FALSE
 )
 
 # To view the chart interactively in most R environments, just print it:
-plot_obj
+PLOT
 
 # Alternatively, you could save the widget to an HTML file:
 # htmlwidgets::saveWidget(widget = plot_obj, file = "combinedPlotExample.html")

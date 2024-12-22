@@ -60,6 +60,10 @@
 #'
 #' @return A highchart object if either data.lines or data.points is provided. 
 #'         Returns NULL if both are NULL, with a soft warning.
+#' @importFrom grDevices hcl.pals hcl.colors    
+#' @importFrom stats setNames approx
+#' @import highcharter 
+#' @importFrom htmlwidgets saveWidget
 #' @export buildPlot
 #' 
 buildPlot <- function(
@@ -292,20 +296,20 @@ buildPlot <- function(
     }
 
     # Modification to handle area between curves
-    FILL.IDS <- unique(data.lines[fill == TRUE, ID])
+    ID.FILL <- unique(data.lines[fill == TRUE, ID])
 
     # If exactly two IDs are marked for filling
-    if (length(FILL.IDS) == 2) {
-      COMMON.X <- sort(unique(c(data.lines[ID == FILL.IDS[1]]$X, data.lines[ID == FILL.IDS[2]]$X)))
-      INTERP.CURVE1 <- approx(
-        data.lines[ID == FILL.IDS[1]]$X,
-        data.lines[ID == FILL.IDS[1]]$Y,
+    if (length(ID.FILL) == 2) {
+      COMMON.X <- sort(unique(c(data.lines[ID == ID.FILL[1]]$X, data.lines[ID == ID.FILL[2]]$X)))
+      IC1 <- approx(
+        data.lines[ID == ID.FILL[1]]$X,
+        data.lines[ID == ID.FILL[1]]$Y,
         xout = COMMON.X,
         method = interpolation.method
       )
-      INTERP.CURVE2 <- approx(
-        data.lines[ID == FILL.IDS[2]]$X,
-        data.lines[ID == FILL.IDS[2]]$Y,
+      IC2 <- approx(
+        data.lines[ID == ID.FILL[2]]$X,
+        data.lines[ID == ID.FILL[2]]$Y,
         xout = COMMON.X,
         method = interpolation.method
       )
@@ -313,14 +317,14 @@ buildPlot <- function(
       plot.object <- plot.object |>
         hc_add_series(
           data = data.frame(
-            x = COMMON.X,
-            low = pmin(INTERP.CURVE1$y, INTERP.CURVE2$y),
-            high = pmax(INTERP.CURVE1$y, INTERP.CURVE2$y)
+            X = COMMON.X,
+            LOW = pmin(IC1$y, IC2$y),
+            HIGH = pmax(IC1$y, IC2$y)
           ),
           type = "arearange",
-          hcaes(x = x, low = low, high = high),
-          name = paste("Area between", FILL.IDS[1], "and", FILL.IDS[2]),
-          color = ID.COLOR.MAP[as.character(FILL.IDS[1])],
+          hcaes(x = X, low = LOW, high = HIGH),
+          name = paste("Area between", ID.FILL[1], "and", ID.FILL[2]),
+          color = ID.COLOR.MAP[as.character(ID.FILL[1])],
           fillOpacity = 0.3  # Adjust transparency as needed
         )
     } else if (length(FILL.IDS) > 2) {

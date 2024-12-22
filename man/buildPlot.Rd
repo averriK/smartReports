@@ -45,6 +45,7 @@ buildPlot(
   point.marker = TRUE,
   point.dataLabels = FALSE,
   plot.filename = NULL,
+  interpolation.method = "linear",
   ...
 )
 }
@@ -55,7 +56,8 @@ If NULL, no lines will be plotted.}
 \item{data.points}{A data.table containing columns "ID", "X", "Y", optional "style".
 If NULL, no scatter points will be plotted.}
 
-\item{line.type}{A string indicating whether lines should be "line" or "spline" (for all line groups).}
+\item{line.type}{A string indicating whether lines should be "line" or "spline".
+If an invalid value is provided, it reverts to "line".}
 
 \item{plot.title}{A string for the plot title}
 
@@ -133,6 +135,10 @@ However, a default style is used if data.points$style is missing or invalid.}
 
 \item{plot.filename}{A string for the plot filename, if saving}
 
+\item{interpolation.method}{A string specifying the interpolation method used by approx().
+Defaults to "linear". Other valid values include "constant", "spline", etc.
+For large datasets, you can also consider downsampling or chunking externally.}
+
 \item{...}{Additional arguments (unused)}
 }
 \value{
@@ -141,4 +147,10 @@ Returns NULL if both are NULL, with a soft warning.
 }
 \description{
 Build a highchart plot using separate data sources for lines and points.
+
+Supports the plotting of line and scatter series. Includes optional arearange shading between
+two line groups if indicated in data.lines$fill and interpolation is handled via the approx function
+(which can be customized using the interpolation.method argument). Fallback behaviors:
+if an invalid line.type is provided, "line" is used; if an invalid or missing line style is found,
+"solid" is used; if an invalid color.palette is provided, a default Highcharts palette is chosen.
 }
