@@ -160,24 +160,23 @@ buildPlot <- function(
   validate_data(data.lines, "data.lines")
   validate_data(data.points, "data.points")
 
-  # Create color mapping
-  COLORS <- grDevices::hcl.colors(
-    n = length(unique(c(
-      if (!is.null(data.lines)) unique(data.lines$ID) else character(0),
-      if (!is.null(data.points)) unique(data.points$ID) else character(0)
-    ))), 
-    palette = color.palette
-  )
+  # Simplify color mapping
   id_color_map <- stats::setNames(
-    COLORS, 
+    grDevices::hcl.colors(
+      n = length(unique(c(
+        if (!is.null(data.lines)) data.lines$ID,
+        if (!is.null(data.points)) data.points$ID
+      ))), 
+      palette = color.palette
+    ),
     unique(c(
-      if (!is.null(data.lines)) unique(data.lines$ID) else character(0),
-      if (!is.null(data.points)) unique(data.points$ID) else character(0)
+      if (!is.null(data.lines)) data.lines$ID,
+      if (!is.null(data.points)) data.points$ID
     ))
   )
 
-  # Initialize highchart plot
-  PLOT <- highchart() |>
+  # Initialize plot with lowercase name
+  plot <- highchart() |>
     hc_xAxis(
       labels = list(enabled = xAxis.label),
       title = list(
@@ -203,21 +202,21 @@ buildPlot <- function(
 
   # Theme handling
   if (!is.null(plot.theme)) {
-    PLOT <- PLOT |> hc_add_theme(plot.theme)
+    plot <- plot |> hc_add_theme(plot.theme)
   } else {
-    PLOT <- PLOT  |> hc_add_theme(hc_theme_flat())
+    plot <- plot  |> hc_add_theme(hc_theme_flat())
   }
 
   # Titles
   if (!is.null(plot.title)) {
-    PLOT <- PLOT |>
+    plot <- plot |>
       hc_title(
         text = plot.title,
         style = list(fontSize = plot.title.fontsize)
       )
   }
   if (!is.null(plot.subtitle)) {
-    PLOT <- PLOT |>
+    plot <- plot |>
       hc_subtitle(
         text = plot.subtitle,
         style = list(fontSize = plot.subtitle.fontsize)
@@ -226,12 +225,12 @@ buildPlot <- function(
 
   # Plot size
   if (!is.null(plot.height) || !is.null(plot.width)) {
-    PLOT <- PLOT |>
+    plot <- plot |>
       hc_size(height = plot.height, width = plot.width)
   }
 
   # Legend
-  PLOT <- PLOT |>
+  plot <- plot |>
     hc_legend(
       enabled = legend.show,
       align = legend.align,
@@ -265,7 +264,7 @@ buildPlot <- function(
       }
 
       # Build series
-      PLOT <- PLOT |>
+      plot <- plot |>
         hc_add_series(
           data = sub_data,
           type = line.type,
@@ -273,7 +272,8 @@ buildPlot <- function(
           name = as.character(gid),
           color = id_color_map[as.character(gid)],
           dashStyle = dash_style,
-          lineWidth = line.size
+          lineWidth = line.size,
+          marker = list(enabled = FALSE)
         )
     }
 
@@ -301,7 +301,7 @@ buildPlot <- function(
       )
       
       # Add the area series
-      PLOT <- PLOT |>
+      plot <- plot |>
         hc_add_series(
           data = area_between_data,
           type = "arearange",
@@ -338,7 +338,7 @@ buildPlot <- function(
       }
 
       # Build scatter series
-      PLOT <- PLOT |>
+      plot <- plot |>
         hc_add_series(
           data = sub_data,
           type = "scatter", # always scatter for points
@@ -353,19 +353,18 @@ buildPlot <- function(
     }
   }
 
-  # Tooltip
-  TIP <- paste0(
-    "<b>{point.series.name}</b><br>",
-    xAxis.legend, ": {point.x}<br>",
-    yAxis.legend, ": {point.y}"
-  )
-  PLOT <- PLOT |>
+  # Simplify tooltip
+  plot <- plot |>
     hc_tooltip(
       sort = FALSE,
       split = FALSE,
       crosshairs = TRUE,
       headerFormat = "",
-      pointFormat = TIP
+      pointFormat = sprintf(
+        "<b>{point.series.name}</b><br>%s: {point.x}<br>%s: {point.y}",
+        xAxis.legend,
+        yAxis.legend
+      )
     ) |>
     hc_plotOptions(
       series = list(
@@ -380,7 +379,7 @@ buildPlot <- function(
       stop("Y in data.lines must be numeric for max-abs calculations.")
     }
     data_abs <- data.lines[, .SD[which.max(abs(Y))], by = ID]
-    PLOT <- PLOT |>
+    plot <- plot |>
       hc_annotations(
         list(
           labels = lapply(seq_len(nrow(data_abs)), function(i) {
@@ -402,11 +401,11 @@ buildPlot <- function(
       plot.filename <- "plot.html"
 
     # Because this is package code, you might be using:
-    # htmlwidgets::saveWidget(widget = PLOT, file = plot.filename)
+    # htmlwidgets::saveWidget(widget = plot, file = plot.filename)
     # Or handle it elsewhere in your package.
-    saveWidget(widget = PLOT, file = plot.filename)
+    saveWidget(widget = plot, file = plot.filename)
   }
 
-  return(PLOT)
+  return(plot)
 }
 # nolint end
