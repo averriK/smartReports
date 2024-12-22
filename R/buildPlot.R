@@ -1,11 +1,19 @@
 # nolint start
 #' @title Build a highchart plot
 #' @description Build a highchart plot using separate data sources for lines and points.
+#'
+#' Supports the plotting of line and scatter series. Includes optional arearange shading between
+#' two line groups if indicated in data.lines$fill and interpolation is handled via the approx function 
+#' (which can be customized using the interpolation.method argument). Fallback behaviors:
+#' if an invalid line.type is provided, "line" is used; if an invalid or missing line style is found, 
+#' "solid" is used; if an invalid color.palette is provided, a default Highcharts palette is chosen.
+#'
 #' @param data.lines A data.table containing columns "ID", "X", "Y", optional "style", optional "fill". 
 #'                   If NULL, no lines will be plotted. 
 #' @param data.points A data.table containing columns "ID", "X", "Y", optional "style". 
 #'                    If NULL, no scatter points will be plotted.
-#' @param line.type A string indicating whether lines should be "line" or "spline" (for all line groups).
+#' @param line.type A string indicating whether lines should be "line" or "spline". 
+#'                  If an invalid value is provided, it reverts to "line".
 #' @param plot.title A string for the plot title
 #' @param plot.subtitle A string for the plot subtitle
 #' @param plot.height A numeric for the plot height
@@ -45,7 +53,11 @@
 #' @param point.marker Deprecated; point markers are now controlled via data.points$style. 
 #' @param point.dataLabels A logical for whether data labels appear for points
 #' @param plot.filename A string for the plot filename, if saving
+#' @param interpolation.method A string specifying the interpolation method used by approx(). 
+#'                             Defaults to "linear". Other valid values include "constant", "spline", etc. 
+#'                             For large datasets, you can also consider downsampling or chunking externally.
 #' @param ... Additional arguments (unused)
+#'
 #' @return A highchart object if either data.lines or data.points is provided. 
 #'         Returns NULL if both are NULL, with a soft warning.
 #' @export buildPlot
@@ -91,6 +103,7 @@ buildPlot <- function(
   point.marker = TRUE,      # DEPRECATED, replaced by data.points$style
   point.dataLabels = FALSE,
   plot.filename = NULL,
+  interpolation.method = "linear",
   ...
 ) {
   # Soft check if both data.lines and data.points are NULL
@@ -99,12 +112,18 @@ buildPlot <- function(
     return(NULL)
   }
 
-  # Validate numeric inputs
+  # Validate numeric inputs (warn & set default, instead of stop)
   if (!is.numeric(line.size) || line.size <= 0) {
-    stop("line.size must be a positive number")
+    warning(
+      sprintf("line.size should be a positive numeric. Using default (1) instead of '%s'.", line.size)
+    )
+    line.size <- 1
   }
   if (!is.numeric(point.size) || point.size <= 0) {
-    stop("point.size must be a positive number")
+    warning(
+      sprintf("point.size should be a positive numeric. Using default (3) instead of '%s'.", point.size)
+    )
+    point.size <- 3
   }
 
   # Validate color palette
@@ -115,7 +134,7 @@ buildPlot <- function(
 
   # Prepare name mappings for line dash styles
   # Lowercased keys map to Highcharts dashStyle
-  LINE_STYLE_MAP <- list(
+  LINE.STYLE <- list(
     "solid"          = "Solid",
     "dashed"         = "Dash",
     "dotted"         = "Dot",
@@ -129,7 +148,7 @@ buildPlot <- function(
   )
 
   # Prepare name mappings for point marker styles
-  POINT_STYLE_MAP <- list(
+  POINT.STYLE <- list(
     "circle"        = "circle",
     "square"        = "square",
     "diamond"       = "diamond",
@@ -145,10 +164,9 @@ buildPlot <- function(
   }
 
   # Validate data inputs
-  validate_data <- function(data, data_name) {
+  validateData <- function(data, data_name) {
     if (!is.null(data)) {
-      needed_cols <- c("ID", "X", "Y")
-      if (!all(needed_cols %in% colnames(data))) {
+      if (!all(c("ID", "X", "Y") %in% colnames(data))) {
         stop(sprintf("%s must contain columns named ID, X, and Y if not NULL.", data_name))
       }
       if (!is.numeric(data$Y)) {
@@ -157,26 +175,24 @@ buildPlot <- function(
     }
   }
 
-  validate_data(data.lines, "data.lines")
-  validate_data(data.points, "data.points")
+  validateData(data.lines, "data.lines")
+  validateData(data.points, "data.points")
 
-  # Simplify color mapping
-  id_color_map <- stats::setNames(
+  # Simplify color mapping (collect all IDs for consistent color usage)
+  ALL.IDS <- unique(c(
+    if (!is.null(data.lines)) data.lines$ID,
+    if (!is.null(data.points)) data.points$ID
+  ))
+  ID.COLOR.MAP <- stats::setNames(
     grDevices::hcl.colors(
-      n = length(unique(c(
-        if (!is.null(data.lines)) data.lines$ID,
-        if (!is.null(data.points)) data.points$ID
-      ))), 
+      n = length(ALL.IDS), 
       palette = color.palette
     ),
-    unique(c(
-      if (!is.null(data.lines)) data.lines$ID,
-      if (!is.null(data.points)) data.points$ID
-    ))
+    ALL.IDS
   )
 
-  # Initialize plot with lowercase name
-  plot <- highchart() |>
+  # Initialize plot object
+  plot.object <- highchart() |>
     hc_xAxis(
       labels = list(enabled = xAxis.label),
       title = list(
@@ -202,21 +218,21 @@ buildPlot <- function(
 
   # Theme handling
   if (!is.null(plot.theme)) {
-    plot <- plot |> hc_add_theme(plot.theme)
+    plot.object <- plot.object |> hc_add_theme(plot.theme)
   } else {
-    plot <- plot  |> hc_add_theme(hc_theme_flat())
+    plot.object <- plot.object |> hc_add_theme(hc_theme_flat())
   }
 
   # Titles
   if (!is.null(plot.title)) {
-    plot <- plot |>
+    plot.object <- plot.object |>
       hc_title(
         text = plot.title,
         style = list(fontSize = plot.title.fontsize)
       )
   }
   if (!is.null(plot.subtitle)) {
-    plot <- plot |>
+    plot.object <- plot.object |>
       hc_subtitle(
         text = plot.subtitle,
         style = list(fontSize = plot.subtitle.fontsize)
@@ -225,12 +241,12 @@ buildPlot <- function(
 
   # Plot size
   if (!is.null(plot.height) || !is.null(plot.width)) {
-    plot <- plot |>
+    plot.object <- plot.object |>
       hc_size(height = plot.height, width = plot.width)
   }
 
   # Legend
-  plot <- plot |>
+  plot.object <- plot.object |>
     hc_legend(
       enabled = legend.show,
       align = legend.align,
@@ -243,19 +259,17 @@ buildPlot <- function(
   # ============ LINES =============
   if (!is.null(data.lines)) {
     # For each unique group in data.lines, add a series
-    unique_line_ids <- unique(data.lines$ID)
-
-    for (gid in unique_line_ids) {
-      sub_data <- data.lines[ID == gid]
+    for (gid in unique(data.lines$ID)) {
+      #sub_data <- data.lines[ID == gid]
 
       # Determine dash style from sub_data$style, if present
-      dash_candidate <- if ("style" %in% names(sub_data)) {
-        tolower(as.character(sub_data$style[1]))
+      dash_candidate <- if ("style" %in% names( data.lines[ID == gid])) {
+        tolower(as.character( data.lines[ID == gid]$style[1]))
       } else {
         tolower(line.style)  # fallback
       }
 
-      dash_style <- LINE_STYLE_MAP[[dash_candidate]]
+      dash_style <- LINE.STYLE[[dash_candidate]]
       if (is.null(dash_style)) {
         # If invalid, warn & use default
         warning(sprintf("Invalid line style '%s' for ID='%s'. Using '%s'.", 
@@ -263,14 +277,14 @@ buildPlot <- function(
         dash_style <- line.style
       }
 
-      # Build series
-      plot <- plot |>
+      # Build line series
+      plot.object <- plot.object |>
         hc_add_series(
-          data = sub_data,
+          data =  data.lines[ID == gid],
           type = line.type,
           hcaes(x = X, y = Y),
           name = as.character(gid),
-          color = id_color_map[as.character(gid)],
+          color = ID.COLOR.MAP[as.character(gid)],
           dashStyle = dash_style,
           lineWidth = line.size,
           marker = list(enabled = FALSE)
@@ -278,39 +292,38 @@ buildPlot <- function(
     }
 
     # Modification to handle area between curves
-    fill_ids <- unique(data.lines[fill == TRUE, ID])
-    
+    FILL.IDS <- unique(data.lines[fill == TRUE, ID])
+
     # If exactly two IDs are marked for filling
-    if (length(fill_ids) == 2) {
-      # Prepare data for the two curves
-      data_curve1 <- data.lines[ID == fill_ids[1]]
-      data_curve2 <- data.lines[ID == fill_ids[2]]
-      
-      # Ensure both curves have same X points (interpolate if needed)
-      common_x <- sort(unique(c(data_curve1$X, data_curve2$X)))
-      
-      # Interpolate Y values for both curves to match common X
-      interp_curve1 <- approx(data_curve1$X, data_curve1$Y, xout = common_x)
-      interp_curve2 <- approx(data_curve2$X, data_curve2$Y, xout = common_x)
-      
-      # Create a data frame for the area between curves
-      area_between_data <- data.frame(
-        x = common_x,
-        low = pmin(interp_curve1$y, interp_curve2$y),
-        high = pmax(interp_curve1$y, interp_curve2$y)
+    if (length(FILL.IDS) == 2) {
+      COMMON.X <- sort(unique(c(data.lines[ID == FILL.IDS[1]]$X, data.lines[ID == FILL.IDS[2]]$X)))
+      INTERP.CURVE1 <- approx(
+        data.lines[ID == FILL.IDS[1]]$X,
+        data.lines[ID == FILL.IDS[1]]$Y,
+        xout = COMMON.X,
+        method = interpolation.method
       )
-      
-      # Add the area series
-      plot <- plot |>
+      INTERP.CURVE2 <- approx(
+        data.lines[ID == FILL.IDS[2]]$X,
+        data.lines[ID == FILL.IDS[2]]$Y,
+        xout = COMMON.X,
+        method = interpolation.method
+      )
+
+      plot.object <- plot.object |>
         hc_add_series(
-          data = area_between_data,
+          data = data.frame(
+            x = COMMON.X,
+            low = pmin(INTERP.CURVE1$y, INTERP.CURVE2$y),
+            high = pmax(INTERP.CURVE1$y, INTERP.CURVE2$y)
+          ),
           type = "arearange",
           hcaes(x = x, low = low, high = high),
-          name = paste("Area between", fill_ids[1], "and", fill_ids[2]),
-          color = id_color_map[as.character(fill_ids[1])],
+          name = paste("Area between", FILL.IDS[1], "and", FILL.IDS[2]),
+          color = ID.COLOR.MAP[as.character(FILL.IDS[1])],
           fillOpacity = 0.3  # Adjust transparency as needed
         )
-    } else if (length(fill_ids) > 2) {
+    } else if (length(FILL.IDS) > 2) {
       warning("More than two IDs marked for filling. Only first two will be used.")
     }
   }
@@ -318,19 +331,17 @@ buildPlot <- function(
   # ============ POINTS =============
   if (!is.null(data.points)) {
     # For each unique group in data.points, add a scatter series
-    unique_point_ids <- unique(data.points$ID)
-
-    for (gid in unique_point_ids) {
-      sub_data <- data.points[ID == gid]
+    for (gid in unique(data.points$ID)) {
+      #sub_data <- data.points[ID == gid]
 
       # Determine point style from sub_data$style (fallback to point.style if missing)
-      sym_candidate <- if ("style" %in% names(sub_data)) {
-        tolower(as.character(sub_data$style[1]))
+      sym_candidate <- if ("style" %in% names(data.points[ID == gid])) {
+        tolower(as.character(data.points[ID == gid]$style[1]))
       } else {
         tolower(point.style)  # fallback
       }
 
-      symbol_style <- POINT_STYLE_MAP[[sym_candidate]]
+      symbol_style <- POINT.STYLE[[sym_candidate]]
       if (is.null(symbol_style)) {
         warning(sprintf("Invalid point style '%s' for ID='%s'. Using '%s'.", 
                         sym_candidate, gid, point.style))
@@ -338,13 +349,13 @@ buildPlot <- function(
       }
 
       # Build scatter series
-      plot <- plot |>
+      plot.object <- plot.object |>
         hc_add_series(
-          data = sub_data,
+          data = data.points[ID == gid],
           type = "scatter", # always scatter for points
           hcaes(x = X, y = Y),
           name = as.character(gid),
-          color = id_color_map[as.character(gid)],
+          color = ID.COLOR.MAP[as.character(gid)],
           marker = list(
             symbol = symbol_style,
             radius = point.size
@@ -354,7 +365,7 @@ buildPlot <- function(
   }
 
   # Simplify tooltip
-  plot <- plot |>
+  plot.object <- plot.object |>
     hc_tooltip(
       sort = FALSE,
       split = FALSE,
@@ -379,7 +390,7 @@ buildPlot <- function(
       stop("Y in data.lines must be numeric for max-abs calculations.")
     }
     data_abs <- data.lines[, .SD[which.max(abs(Y))], by = ID]
-    plot <- plot |>
+    plot.object <- plot.object |>
       hc_annotations(
         list(
           labels = lapply(seq_len(nrow(data_abs)), function(i) {
@@ -403,9 +414,9 @@ buildPlot <- function(
     # Because this is package code, you might be using:
     # htmlwidgets::saveWidget(widget = plot, file = plot.filename)
     # Or handle it elsewhere in your package.
-    saveWidget(widget = plot, file = plot.filename)
+    saveWidget(widget = plot.object, file = plot.filename)
   }
 
-  return(plot)
+  return(plot.object)
 }
 # nolint end
