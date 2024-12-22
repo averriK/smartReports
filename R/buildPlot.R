@@ -1,490 +1,397 @@
 # nolint start
-#' Build Plot Function
-#'
-#' A function to create plots using either ggplot2 or highcharter libraries.
-#' @param data A data.frame containing at least columns named ID, X, and Y.
-#' @param library A string specifying which plotting library to use ("ggplot2" or "highcharter").
-#' @param ... Additional parameters to customize the plot.
-#' @return A plot object from the specified library.
-#' @export
-#' @import ggplot2
-#' @import highcharter
-#' @importFrom ggthemes theme_foundation
-#' @importFrom utils modifyList
-#' @import data.table
-#' @importFrom grDevices hcl.colors
-#' @importFrom htmlwidgets saveWidget
-#' @import scales
-#' @import RColorBrewer
-
+#' @title Build a highchart plot
+#' @description Build a highchart plot using separate data sources for lines and points.
+#' @param data.lines A data.table containing columns "ID", "X", "Y", optional "style", optional "fill". 
+#'                   If NULL, no lines will be plotted. 
+#' @param data.points A data.table containing columns "ID", "X", "Y", optional "style". 
+#'                    If NULL, no scatter points will be plotted.
+#' @param line.type A string indicating whether lines should be "line" or "spline" (for all line groups).
+#' @param plot.title A string for the plot title
+#' @param plot.subtitle A string for the plot subtitle
+#' @param plot.height A numeric for the plot height
+#' @param plot.width A numeric for the plot width
+#' @param xAxis.legend A string for the x-axis legend
+#' @param yAxis.legend A string for the y-axis legend
+#' @param group.legend A string for the group legend
+#' @param color.palette A string for the color palette (must exist in grDevices::hcl.pals())
+#' @param line.style Deprecated; line styles are taken from data.lines$style. 
+#'                   However, a default style is used if data.lines$style is missing or invalid.
+#' @param point.style Deprecated; point styles are taken from data.points$style. 
+#'                    However, a default style is used if data.points$style is missing or invalid.
+#' @param line.size A numeric for the line width
+#' @param point.size A numeric for the point size
+#' @param xAxis.log A logical for the x-axis log scale
+#' @param yAxis.log A logical for the y-axis log scale
+#' @param xAxis.reverse A logical for the x-axis reverse
+#' @param yAxis.reverse A logical for the y-axis reverse
+#' @param xAxis.max A numeric for the x-axis max
+#' @param yAxis.max A numeric for the y-axis max
+#' @param xAxis.min A numeric for the x-axis min
+#' @param yAxis.min A numeric for the y-axis min
+#' @param xAxis.label A logical for the x-axis label
+#' @param yAxis.label A logical for the y-axis label
+#' @param legend.layout A string for the legend layout
+#' @param legend.align A string for the legend align
+#' @param legend.valign A string for the legend valign
+#' @param legend.show A logical for the legend show
+#' @param plot.save A logical for the plot save
+#' @param plot.theme A highchart theme object
+#' @param xAxis.legend.fontsize A string for the x-axis legend fontsize
+#' @param yAxis.legend.fontsize A string for the y-axis legend fontsize
+#' @param group.legend.fontsize A string for the group legend fontsize
+#' @param plot.title.fontsize A string for the plot title fontsize
+#' @param plot.subtitle.fontsize A string for the plot subtitle fontsize
+#' @param print.max.abs A logical for printing max absolute Y labels as annotations (only for lines)
+#' @param point.marker Deprecated; point markers are now controlled via data.points$style. 
+#' @param point.dataLabels A logical for whether data labels appear for points
+#' @param plot.filename A string for the plot filename, if saving
+#' @param ... Additional arguments (unused)
+#' @return A highchart object if either data.lines or data.points is provided. 
+#'         Returns NULL if both are NULL, with a soft warning.
+#' @export buildPlot
+#' 
 buildPlot <- function(
-  data,
-  library = "ggplot2",
+  data.lines = NULL,
+  data.points = NULL,
+  line.type = "line",  # Must be "line" or "spline"
+  plot.title = NULL,
+  plot.subtitle = NULL,
+  plot.height = NULL,
+  plot.width = NULL,
+  xAxis.legend = "X",
+  yAxis.legend = "Y",
+  group.legend = "ID",
+  color.palette = "Dark 3",
+  line.style = "Solid",      # DEPRECATED, only used if data.lines$style is missing
+  point.style = "circle",    # DEPRECATED, only used if data.points$style is missing
+  line.size = 1,
+  point.size = 3,
+  xAxis.log = FALSE,
+  yAxis.log = FALSE,
+  xAxis.reverse = FALSE,
+  yAxis.reverse = FALSE,
+  xAxis.max = NA,
+  yAxis.max = NA,
+  xAxis.min = NA,
+  yAxis.min = NA,
+  xAxis.label = TRUE,
+  yAxis.label = TRUE,
+  legend.layout = "horizontal",
+  legend.align = "right", # c("center","left","right")
+  legend.valign = "top",  # c("top","middle","bottom")
+  legend.show = TRUE,
+  plot.save = FALSE,
+  plot.theme = NULL,
+  xAxis.legend.fontsize = "14px",
+  yAxis.legend.fontsize = "14px",
+  group.legend.fontsize = "12px",
+  plot.title.fontsize = "24px",
+  plot.subtitle.fontsize = "18px",
+  print.max.abs = FALSE,
+  point.marker = TRUE,      # DEPRECATED, replaced by data.points$style
+  point.dataLabels = FALSE,
+  plot.filename = NULL,
   ...
 ) {
-  . <- NULL
-  # Ensure required columns are present in data
-  if (!all(c("ID", "X", "Y") %in% colnames(data))) {
-    stop("data must contain columns named ID, X, and Y")
+
+  # Soft check if both data.lines and data.points are NULL
+  if (is.null(data.lines) && is.null(data.points)) {
+    warning("No data provided for lines or points. Returning NULL.")
+    return(NULL)
   }
 
-  # Define default parameters
-  default_params <- list(
-    plot.object = NULL,
-    plot.title = NULL,
-    plot.subtitle = NULL,
-    plot.height = NULL,
-    plot.width = NULL,
-    xAxis.legend = "X",
-    yAxis.legend = "Y",
-    group.legend = "ID",
-    color.palette = grDevices::hcl.pals()[4],
-    plot.type = "line", # c("line","spline","point","column","bar")
-    line.style = "solid", # For consistency across libraries
-    point.style = "circle",     # For consistency across libraries
-    line.size = 1,
-    point.size = 3,
-    xAxis.log = FALSE,
-    yAxis.log = FALSE,
-    xAxis.reverse = FALSE,
-    yAxis.reverse = FALSE,
-    xAxis.max = NA,
-    yAxis.max = NA,
-    xAxis.min = NA,
-    yAxis.min = NA,
-    xAxis.label = TRUE,
-    yAxis.label = TRUE,
-    legend.layout = "horizontal",
-    legend.align = "right", # c("center", "left", "right")
-    legend.valign = "top",  # c("top", "middle", "bottom")
-    legend.show = TRUE,
-    plot.save = FALSE, # Changed to FALSE as default
-    plot.theme = NULL,
-    xAxis.legend.fontsize = "14px",
-    yAxis.legend.fontsize = "14px",
-    group.legend.fontsize = "12px",
-    plot.title.fontsize = "24px",
-    plot.subtitle.fontsize = "18px",
-    print.max.abs = FALSE, # Default
-    fill.polygon = FALSE,  # Default
-    fill.group = "ID",       # Default
-    point.marker = TRUE,
-    point.dataLabels = FALSE,
-    plot.filename = NULL  # For saving plots
-  )
-
-  # Capture user-provided parameters
-  user_params <- list(...)
-
-  # Merge default parameters with user-provided parameters
-  params <- modifyList(default_params, user_params)
-  params$data <- data  # Include data in params
-
-  # Validate legend parameters
-  valid_valign <- c("top", "middle", "bottom")
-  valid_align <- c("left", "center", "right")
-  valid_layout <- c("horizontal", "vertical")
-  if (!(params$legend.valign %in% valid_valign)) {
-    stop(paste("Invalid legend.valign:", params$legend.valign, "Expected one of:", paste(valid_valign, collapse = ", ")))
+  # Validate numeric inputs
+  if (!is.numeric(line.size) || line.size <= 0) {
+    stop("line.size must be a positive number")
   }
-  if (!(params$legend.align %in% valid_align)) {
-    stop(paste("Invalid legend.align:", params$legend.align, "Expected one of:", paste(valid_align, collapse = ", ")))
-  }
-  if (!(params$legend.layout %in% valid_layout)) {
-    stop(paste("Invalid legend.layout:", params$legend.layout, "Expected one of:", paste(valid_layout, collapse = ", ")))
+  if (!is.numeric(point.size) || point.size <= 0) {
+    stop("point.size must be a positive number")
   }
 
-  # Map line.style to appropriate values
-  line.style.map <- list(
-    "solid" = "solid",
-    "dashed" = "dashed",
-    "dotted" = "dotted",
-    "dotdash" = "dotdash",
-    "longdash" = "longdash",
-    "twodash" = "twodash"
-  )
-  params$line.style <- line.style.map[[tolower(params$line.style)]] %||% params$line.style
-
-  # Map point.style to appropriate shapes for ggplot2 and highcharter
-  point.style.map <- list(
-    "circle" = list(ggplot2 = 16, highcharter = "circle"),
-    "square" = list(ggplot2 = 15, highcharter = "square"),
-    "diamond" = list(ggplot2 = 18, highcharter = "diamond"),
-    "triangle" = list(ggplot2 = 17, highcharter = "triangle"),
-    "triangle-down" = list(ggplot2 = 25, highcharter = "triangle-down")
-  )
-  selected.point.style <- point.style.map[[tolower(as.character(params$point.style))]]
-  if (!is.null(selected.point.style)) {
-    params$point.style.ggplot2 <- selected.point.style$ggplot2
-    params$point.style.highcharter <- selected.point.style$highcharter
-  } else {
-    # Default to circle if not specified
-    params$point.style.ggplot2 <- 16
-    params$point.style.highcharter <- "circle"
+  # Validate color palette
+  if (!color.palette %in% grDevices::hcl.pals()) {
+    warning("Invalid color palette. Using default.")
+    color.palette <- grDevices::hcl.pals()[4]
   }
 
-  # Set default theme if not specified
-  if (is.null(params$plot.theme)) {
-    if (tolower(library) %in% c("ggplot2", "gg", "ggplot")) {
-      params$plot.theme <- ggthemes::theme_foundation()
-    } else if (tolower(library) %in% c("highcharter", "hc", "highchart")) {
-      params$plot.theme <- highcharter::hc_theme_flat()
-    }
-  }
-
-  # Call the respective plot function based on the library parameter
-  if (tolower(library) %in% c("ggplot2", "gg", "ggplot")) {
-    result <- buildPlot.ggplot2(params)
-  } else if (tolower(library) %in% c("highcharter", "hc", "highchart")) {
-    result <- buildPlot.highcharter(params)
-  } else {
-    stop("Unsupported library specified")
-  }
-
-  return(result)
-}
-
-# Utility operator for default values
-`%||%` <- function(a, b) if (!is.null(a)) a else b
-
-# Helper function for ggplot2
-buildPlot.ggplot2 <- function(params) {
-  . <- NULL
-  # Extract parameters
-  data <- as.data.table(params$data)[, .(ID, X, Y)]
-  data[, ID := as.factor(ID)]  # Convert ID to factor
-
-  # Prepare the plot object
-  if (is.null(params$plot.object)) {
-    PLOT <- ggplot(
-      data = data,
-      aes(x = X, y = Y, group = ID, color = ID)
-    )
-  } else {
-    PLOT <- params$plot.object
-    PLOT <- PLOT + geom_blank() # Ensure it accepts additional layers
-  }
-
-  # Generate colors
-  NID <- length(unique(data$ID))
-  COLORS <- grDevices::hcl.colors(n = NID, palette = params$color.palette)
-
-  # Add layers based on plot type
-  if (tolower(params$plot.type) == "line") {
-    PLOT <- PLOT +
-      geom_line(
-        aes(color = ID),
-        size = params$line.size,
-        linetype = params$line.style
-      ) +
-      scale_color_manual(values = COLORS)
-  }
-
-  if (tolower(params$plot.type) == "spline") {
-    PLOT <- PLOT +
-      geom_smooth(
-        aes(color = ID),
-        method = 'loess',
-        size = params$line.size,
-        linetype = params$line.style,
-        se = FALSE
-      ) +
-      scale_color_manual(values = COLORS)
-  }
-
-  if (tolower(params$plot.type) %in% c("scatter", "point")) {
-    PLOT <- PLOT +
-      geom_point(
-        aes(color = ID),
-        size = params$point.size,
-        shape = params$point.style.ggplot2
-      ) +
-      scale_color_manual(values = COLORS)
-  }
-
-  # Fill polygon
-  if (params$fill.polygon) {
-    PLOT <- PLOT +
-      geom_area(
-        aes_string(fill = params$fill.group),
-        alpha = 0.5
-      ) +
-      scale_fill_manual(values = COLORS)
-  }
-
-  # Print max absolute value
-  if (params$print.max.abs) {
-    data_abs <- data[, .SD[which.max(abs(Y))], by = ID]
-    PLOT <- PLOT +
-      geom_text(
-        data = data_abs,
-        aes(label = paste0("Max Abs: ", round(Y, 2))),
-        vjust = -1
-      )
-  }
-
-  # Axis transformations
-  if (params$yAxis.log == TRUE) {
-    PLOT <- PLOT + scale_y_log10()
-  }
-  if (params$xAxis.log == TRUE) {
-    PLOT <- PLOT + scale_x_log10()
-  }
-
-  if (params$yAxis.reverse == TRUE) {
-    PLOT <- PLOT + scale_y_reverse()
-  }
-
-  if (params$xAxis.reverse == TRUE) {
-    PLOT <- PLOT + scale_x_reverse()
-  }
-
-  # Titles and labels
-  if (!is.null(params$plot.title)) {
-    PLOT <- PLOT + ggtitle(params$plot.title)
-  }
-
-  if (!is.null(params$plot.subtitle)) {
-    PLOT <- PLOT + labs(subtitle = params$plot.subtitle)
-  }
-
-  PLOT <- PLOT + xlab(params$xAxis.legend) + ylab(params$yAxis.legend)
-
-  if (params$xAxis.label == FALSE) {
-    PLOT <- PLOT + theme(axis.title.x = element_blank())
-  }
-
-  if (params$yAxis.label == FALSE) {
-    PLOT <- PLOT + theme(axis.title.y = element_blank())
-  }
-
-  # Legend settings
-  if (params$legend.show) {
-    PLOT <- PLOT + theme(
-      legend.position = c(
-        switch(params$legend.align,
-               "left" = 0,
-               "center" = 0.5,
-               "right" = 1),
-        switch(params$legend.valign,
-               "bottom" = 0,
-               "middle" = 0.5,
-               "top" = 1)
-      ),
-      legend.direction = params$legend.layout
-    )
-  } else {
-    PLOT <- PLOT + theme(legend.position = "none")
-  }
-
-  # Apply theme
-  PLOT <- PLOT + params$plot.theme
-
-  # Plot Save
-  if (params$plot.save) {
-    ggsave(
-      filename = params$plot.filename %||% "plot.png",
-      plot = PLOT,
-      width = params$plot.width %||% 7,
-      height = params$plot.height %||% 5
-    )
-  }
-
-  # Return the plot
-  return(PLOT)
-}
-
-# Helper function for highcharter
-buildPlot.highcharter <- function(params) {
-  # Ensure required columns are present in data
-  if (!all(c("ID", "X", "Y") %in% colnames(params$data))) {
-    stop("data must contain columns named ID, X, and Y")
-  }
-  
-  data <- params$data
-  
-  # Map plot.type to valid Highcharter types
-  plot.type.map <- list(
-    "line" = "line",
-    "spline" = "spline",
-    "area" = "area",
-    "areaspline" = "areaspline",
-    "column" = "column",
-    "bar" = "bar",
-    "scatter" = "scatter",
-    "point" = "scatter"  # Map "point" to "scatter"
-  )
-  params$plot.type <- plot.type.map[[tolower(params$plot.type)]] %||% params$plot.type
-  
-  # Map your line.style to Highcharter's dashStyle directly
-  line.style.map <- list(
-    "solid" = "Solid",
-    "dashed" = "Dash",
-    "dotted" = "Dot",
-    "dotdash" = "DashDot",
-    "longdash" = "LongDash",
-    "twodash" = "Dash",
-    "shortdash" = "ShortDash",
-    "shortdot" = "ShortDot",
-    "shortdashdot" = "ShortDashDot",
+  # Prepare name mappings for line dash styles
+  # Lowercased keys map to Highcharts dashStyle
+  LINE_STYLE_MAP <- list(
+    "solid"          = "Solid",
+    "dashed"         = "Dash",
+    "dotted"         = "Dot",
+    "dotdash"        = "DashDot",
+    "longdash"       = "LongDash",
+    "twodash"        = "Dash",
+    "shortdash"      = "ShortDash",
+    "shortdot"       = "ShortDot",
+    "shortdashdot"   = "ShortDashDot",
     "longdashdotdot" = "LongDashDotDot"
   )
-  params$line.style <- line.style.map[[tolower(params$line.style)]] %||% params$line.style
-  
-  # Map your point.style to Highcharter's marker symbols directly
-  point.style.map <- list(
-    "circle" = "circle",
-    "square" = "square",
-    "diamond" = "diamond",
-    "triangle" = "triangle",
+
+  # Prepare name mappings for point marker styles
+  POINT_STYLE_MAP <- list(
+    "circle"        = "circle",
+    "square"        = "square",
+    "diamond"       = "diamond",
+    "triangle"      = "triangle",
     "triangle-down" = "triangle-down"
   )
-  params$point.style <- point.style.map[[tolower(params$point.style)]] %||% params$point.style
-  
-  # If no existing plot object, create a new highchart object and set axes
-  if (is.null(params$plot.object)) {
-    PLOT <- highchart()
-    
-    # X-axis settings
-    PLOT <- PLOT |>
-      hc_xAxis(
-        labels = list(enabled = params$xAxis.label),
-        title = list(
-          text = params$xAxis.legend,
-          style = list(fontSize = params$xAxis.legend.fontsize)
-        ),
-        type = if (params$xAxis.log) "logarithmic" else "linear",
-        reversed = params$xAxis.reverse,
-        max = if (!is.na(params$xAxis.max)) params$xAxis.max else NULL,
-        min = if (!is.na(params$xAxis.min)) params$xAxis.min else NULL
-      )
-    
+
+  # Pre-check line.type (should be "line" or "spline")
+  # We'll later convert to area/areaspline if fill is TRUE at the group level
+  line.type <- tolower(line.type)
+  if (!(line.type %in% c("line", "spline"))) {
+    warning(sprintf("Provided line.type='%s' is invalid. Using 'line' by default.", line.type))
+    line.type <- "line"
+  }
+
+  # If we have data.lines, ensure it has X, Y, ID
+  if (!is.null(data.lines)) {
+    needed_cols <- c("ID", "X", "Y")
+    if (!all(needed_cols %in% colnames(data.lines))) {
+      stop("data.lines must contain columns named ID, X, and Y if not NULL.")
+    }
+    if (!is.numeric(data.lines$Y)) {
+      stop("Error in buildPlot.highchart(): data.lines$Y must be numeric.")
+    }
+  }
+
+  # If we have data.points, ensure it has X, Y, ID
+  if (!is.null(data.points)) {
+    needed_cols <- c("ID", "X", "Y")
+    if (!all(needed_cols %in% colnames(data.points))) {
+      stop("data.points must contain columns named ID, X, and Y if not NULL.")
+    }
+    if (!is.numeric(data.points$Y)) {
+      stop("Error in buildPlot.highchart(): data.points$Y must be numeric.")
+    }
+  }
+
+  # =====================
+  # Gather IDs for color
+  # =====================
+  line_ids  <- if (!is.null(data.lines))  unique(data.lines$ID)  else character(0)
+  point_ids <- if (!is.null(data.points)) unique(data.points$ID) else character(0)
+  all_ids   <- unique(c(line_ids, point_ids))
+
+  # Create a color mapping for consistent coloring across lines & points
+  NID <- length(all_ids)
+  COLORS <- grDevices::hcl.colors(n = NID, palette = color.palette)
+  id_color_map <- stats::setNames(COLORS, all_ids)
+
+  # Create new highchart (libraries are not called here, as this is part of a package)
+  PLOT <- highchart()
+
+  # X-axis settings
+  PLOT <- PLOT |>
+    hc_xAxis(
+      labels = list(enabled = xAxis.label),
+      title = list(
+        text = xAxis.legend,
+        style = list(fontSize = xAxis.legend.fontsize)
+      ),
+      type = if (xAxis.log) "logarithmic" else "linear",
+      reversed = xAxis.reverse,
+      max = if (!is.na(xAxis.max)) xAxis.max else NULL,
+      min = if (!is.na(xAxis.min)) xAxis.min else NULL
+    ) |>
     # Y-axis settings
-    PLOT <- PLOT |>
-      hc_yAxis(
-        labels = list(enabled = params$yAxis.label),
-        title = list(
-          text = params$yAxis.legend,
-          style = list(fontSize = params$yAxis.legend.fontsize)
-        ),
-        type = if (params$yAxis.log) "logarithmic" else "linear",
-        reversed = params$yAxis.reverse,
-        max = if (!is.na(params$yAxis.max)) params$yAxis.max else NULL,
-        min = if (!is.na(params$yAxis.min)) params$yAxis.min else NULL
-      )
-    
-    # Apply theme
-    PLOT <- PLOT |>
-      hc_add_theme(hc_thm = params$plot.theme)
-    
-    # Titles
-    if (!is.null(params$plot.title)) {
-      PLOT <- PLOT |>
-        hc_title(
-          text = params$plot.title,
-          style = list(fontSize = params$plot.title.fontsize)
-        )
-    }
-    if (!is.null(params$plot.subtitle)) {
-      PLOT <- PLOT |>
-        hc_subtitle(
-          text = params$plot.subtitle,
-          style = list(fontSize = params$plot.subtitle.fontsize)
-        )
-    }
-    
-    # Plot size
-    if (!is.null(params$plot.height) || !is.null(params$plot.width)) {
-      PLOT <- PLOT |>
-        hc_size(height = params$plot.height, width = params$plot.width)
-    }
-    
-    # Legend settings
-    PLOT <- PLOT |>
-      hc_legend(
-        enabled = params$legend.show,
-        align = params$legend.align,
-        verticalAlign = params$legend.valign,
-        layout = params$legend.layout,
-        itemStyle = list(fontSize = params$group.legend.fontsize)
-      ) |>
-      hc_chart(style = list(fontFamily = "Helvetica"))
-  } else {
-    # Use the existing plot object
-    PLOT <- params$plot.object
-  }
-  
-  # Generate colors
-  NID <- length(unique(data$ID))
-  COLORS <- grDevices::hcl.colors(n = NID, palette = params$color.palette)
-  
-  # Handle fill.polygon for area charts
-  if (params$fill.polygon && params$plot.type %in% c("line", "spline")) {
-    # Switch to area chart if fill.polygon is TRUE
-    params$plot.type <- ifelse(params$plot.type == "line", "area", "areaspline")
-  }
-  
-  # Construct arguments for hc_add_series
-  series_args <- list(
-    data = data,
-    type = params$plot.type,
-    hcaes(x = X, y = Y, group = ID),
-    colorByPoint = FALSE,
-    marker = list(
-      enabled = if (params$plot.type == "scatter") TRUE else params$point.marker,
-      symbol = params$point.style,    # Use params$point.style directly
-      radius = params$point.size
+    hc_yAxis(
+      labels = list(enabled = yAxis.label),
+      title = list(
+        text = yAxis.legend,
+        style = list(fontSize = yAxis.legend.fontsize)
+      ),
+      type = if (yAxis.log) "logarithmic" else "linear",
+      reversed = yAxis.reverse,
+      max = if (!is.na(yAxis.max)) yAxis.max else NULL,
+      min = if (!is.na(yAxis.min)) yAxis.min else NULL
     )
-  )
-  
-  # Include line styling only for appropriate plot types
-  if (params$plot.type %in% c("line", "spline", "area", "areaspline")) {
-    series_args$dashStyle <- params$line.style  # Use params$line.style directly
-    series_args$lineWidth <- params$line.size
+
+  # Add theme if provided
+  if (!is.null(plot.theme)) {
+    PLOT <- PLOT |> hc_add_theme(plot.theme)
+  } else {
+    PLOT <- PLOT |> hc_add_theme(hc_theme_flat())
   }
-  
-  # Set fillOpacity for area charts when fill.polygon is TRUE
-  if (params$plot.type %in% c("area", "areaspline")) {
-    series_args$fillOpacity <- if (params$fill.polygon) 0.5 else 1
+
+  # Titles
+  if (!is.null(plot.title)) {
+    PLOT <- PLOT |>
+      hc_title(
+        text = plot.title,
+        style = list(fontSize = plot.title.fontsize)
+      )
   }
-  
-  # Add series to the plot
+  if (!is.null(plot.subtitle)) {
+    PLOT <- PLOT |>
+      hc_subtitle(
+        text = plot.subtitle,
+        style = list(fontSize = plot.subtitle.fontsize)
+      )
+  }
+
+  # Plot size
+  if (!is.null(plot.height) || !is.null(plot.width)) {
+    PLOT <- PLOT |>
+      hc_size(height = plot.height, width = plot.width)
+  }
+
+  # Legend
   PLOT <- PLOT |>
-    do.call(hc_add_series, series_args)
-  
-  # Tooltip settings
+    hc_legend(
+      enabled = legend.show,
+      align = legend.align,
+      verticalAlign = legend.valign,
+      layout = legend.layout,
+      itemStyle = list(fontSize = group.legend.fontsize)
+    ) |>
+    hc_chart(style = list(fontFamily = "Helvetica"))
+
+  # ============ LINES =============
+  if (!is.null(data.lines)) {
+    # For each unique group in data.lines, add a series
+    unique_line_ids <- unique(data.lines$ID)
+
+    for (gid in unique_line_ids) {
+      sub_data <- data.lines[ID == gid]
+
+      # Determine dash style from sub_data$style, if present
+      dash_candidate <- if ("style" %in% names(sub_data)) {
+        tolower(as.character(sub_data$style[1]))
+      } else {
+        tolower(line.style)  # fallback
+      }
+
+      dash_style <- LINE_STYLE_MAP[[dash_candidate]]
+      if (is.null(dash_style)) {
+        # If invalid, warn & use default
+        warning(sprintf("Invalid line style '%s' for ID='%s'. Using '%s'.", 
+                        dash_candidate, gid, line.style))
+        dash_style <- line.style
+      }
+
+      # Build series
+      PLOT <- PLOT |>
+        hc_add_series(
+          data = sub_data,
+          type = line.type,
+          hcaes(x = X, y = Y),
+          name = as.character(gid),
+          color = id_color_map[as.character(gid)],
+          dashStyle = dash_style,
+          lineWidth = line.size
+        )
+    }
+
+    # Modification to handle area between curves
+    fill_ids <- unique(data.lines[fill == TRUE, ID])
+    
+    # If exactly two IDs are marked for filling
+    if (length(fill_ids) == 2) {
+      # Prepare data for the two curves
+      data_curve1 <- data.lines[ID == fill_ids[1]]
+      data_curve2 <- data.lines[ID == fill_ids[2]]
+      
+      # Ensure both curves have same X points (interpolate if needed)
+      common_x <- sort(unique(c(data_curve1$X, data_curve2$X)))
+      
+      # Interpolate Y values for both curves to match common X
+      interp_curve1 <- approx(data_curve1$X, data_curve1$Y, xout = common_x)
+      interp_curve2 <- approx(data_curve2$X, data_curve2$Y, xout = common_x)
+      
+      # Create a data frame for the area between curves
+      area_between_data <- data.frame(
+        x = common_x,
+        low = pmin(interp_curve1$y, interp_curve2$y),
+        high = pmax(interp_curve1$y, interp_curve2$y)
+      )
+      
+      # Add the area series
+      PLOT <- PLOT |>
+        hc_add_series(
+          data = area_between_data,
+          type = "arearange",
+          hcaes(x = x, low = low, high = high),
+          name = paste("Area between", fill_ids[1], "and", fill_ids[2]),
+          color = id_color_map[as.character(fill_ids[1])],
+          fillOpacity = 0.3  # Adjust transparency as needed
+        )
+    } else if (length(fill_ids) > 2) {
+      warning("More than two IDs marked for filling. Only first two will be used.")
+    }
+  }
+
+  # ============ POINTS =============
+  if (!is.null(data.points)) {
+    # For each unique group in data.points, add a scatter series
+    unique_point_ids <- unique(data.points$ID)
+
+    for (gid in unique_point_ids) {
+      sub_data <- data.points[ID == gid]
+
+      # Determine point style from sub_data$style (fallback to point.style if missing)
+      sym_candidate <- if ("style" %in% names(sub_data)) {
+        tolower(as.character(sub_data$style[1]))
+      } else {
+        tolower(point.style)  # fallback
+      }
+
+      symbol_style <- POINT_STYLE_MAP[[sym_candidate]]
+      if (is.null(symbol_style)) {
+        warning(sprintf("Invalid point style '%s' for ID='%s'. Using '%s'.", 
+                        sym_candidate, gid, point.style))
+        symbol_style <- point.style
+      }
+
+      # Build scatter series
+      PLOT <- PLOT |>
+        hc_add_series(
+          data = sub_data,
+          type = "scatter", # always scatter for points
+          hcaes(x = X, y = Y),
+          name = as.character(gid),
+          color = id_color_map[as.character(gid)],
+          marker = list(
+            symbol = symbol_style,
+            radius = point.size
+          )
+        )
+    }
+  }
+
+  # Tooltip
   TIP <- paste0(
-    "<b>{point.ID}</b><br>",
-    params$xAxis.legend, ": {point.x}<br>",
-    params$yAxis.legend, ": {point.y}"
+    "<b>{point.series.name}</b><br>",
+    xAxis.legend, ": {point.x}<br>",
+    yAxis.legend, ": {point.y}"
   )
-  
-  # Apply colors and tooltip
   PLOT <- PLOT |>
-    hc_colors(colors = COLORS) |>
     hc_tooltip(
       sort = FALSE,
       split = FALSE,
       crosshairs = TRUE,
       headerFormat = "",
       pointFormat = TIP
-    )
-  
-  # Plot options
-  PLOT <- PLOT |>
+    ) |>
     hc_plotOptions(
       series = list(
-        dataLabels = list(enabled = params$point.dataLabels)
+        dataLabels = list(enabled = point.dataLabels)
       )
     )
-  
-  # Print max absolute value using annotations
-  if (params$print.max.abs) {
-    data_abs <- data[, .SD[which.max(abs(Y))], by = ID]
+
+  # Print max absolute value using annotations (applied to data.lines only)
+  if (print.max.abs && !is.null(data.lines)) {
+    # Data check
+    if (!is.numeric(data.lines$Y)) {
+      stop("Y in data.lines must be numeric for max-abs calculations.")
+    }
+    data_abs <- data.lines[, .SD[which.max(abs(Y))], by = ID]
     PLOT <- PLOT |>
       hc_annotations(
         list(
-          labels = lapply(1:nrow(data_abs), function(i) {
+          labels = lapply(seq_len(nrow(data_abs)), function(i) {
             list(
               point = list(
                 xAxis = 0, yAxis = 0,
@@ -496,16 +403,18 @@ buildPlot.highcharter <- function(params) {
         )
       )
   }
-  
-  # Plot Save
-  if (params$plot.save) {
-    htmlwidgets::saveWidget(
-      widget = PLOT,
-      file = params$plot.filename %||% "plot.html"
-    )
+
+  # Save if requested
+  if (plot.save) {
+    if (is.null(plot.filename)) 
+      plot.filename <- "plot.html"
+
+    # Because this is package code, you might be using:
+    # htmlwidgets::saveWidget(widget = PLOT, file = plot.filename)
+    # Or handle it elsewhere in your package.
+    saveWidget(widget = PLOT, file = plot.filename)
   }
-  
-  # Return the plot
+
   return(PLOT)
 }
 # nolint end
