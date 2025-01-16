@@ -1,4 +1,73 @@
 format:
+  revealjs:
+    # Basic presentation settings
+    theme: default
+    slide-number: false  # Corresponds to slideNumber
+    show-slide-number: all  # Corresponds to showSlideNumber
+    hash: false  # URL hash for direct slide access
+    history: false  # Push slides to browser history
+    
+    # Navigation and controls
+    controls: true
+    controls-layout: bottom-right
+    controls-tutorial: true  # Help with navigation controls
+    progress: true
+    overview: true  # Enable slide overview mode
+    center: true  # Vertical centering of slides
+    touch: true  # Enable touch navigation
+    keyboard: true  # Enable keyboard navigation
+    loop: false  # Loop presentation
+    rtl: false  # Right-to-left layout
+    
+    # Navigation mode
+    navigation-mode: default  # Options: default, linear, grid
+    
+    # Fragment and transition settings
+    fragments: true  # Enable fragments
+    fragment-in-url: true  # Include fragments in URL
+    transition: slide  # Transition style (none/fade/slide/convex/concave/zoom)
+    transition-speed: default  # default/fast/slow
+    background-transition: fade
+    
+    # Media and preview settings
+    auto-play-media: null  # null/true/false
+    preload-iframes: null  # null/true/false
+    preview-links: false  # Open links in preview overlay
+    
+    # Animation settings
+    auto-animate: true  # Enable auto-animation
+    auto-animate-easing: ease
+    auto-animate-duration: 1.0
+    auto-animate-unmatched: true
+    
+    # View distance settings
+    view-distance: 3  # Number of slides visible ahead/behind
+    mobile-view-distance: 2  # View distance for mobile devices
+    
+    # PDF export settings
+    pdf-max-pages-per-slide: 50  # Maximum pages per slide in PDF
+    pdf-separate-fragments: true  # Print fragments on separate slides
+    pdf-page-height-offset: -1  # Height offset for PDF pages
+    
+    # Misc settings
+    help: true  # Show help overlay
+    pause: true  # Allow presentation pause
+    show-notes: false  # Show speaker notes
+    mouse-wheel: false  # Enable mouse wheel navigation
+    hide-inactive-cursor: true
+    hide-cursor-time: 5000
+    display: block
+    
+    # Additional Quarto-specific settings
+    highlight-style: github
+    footer: "Your Footer Here"  # Optional
+    logo: "path/to/logo.png"  # Optional
+    
+    # Reveal.js plugins can be enabled here
+    plugins: []  # Add required plugins
+    
+    # Custom CSS
+    css: styles.css  # Optional custom CSS file
   html:    
     output-file: index.html
     theme: spacelab 
