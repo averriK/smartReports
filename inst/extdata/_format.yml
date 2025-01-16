@@ -108,17 +108,14 @@ format:
   #============================================================================
   # 2. Reveal.js (Presentation) Options
   #============================================================================
-  revealjs:
-    #---------------------------------------------------------------------------
-    # Core presentation settings
-    #---------------------------------------------------------------------------
-    theme: default                   # "default", "black", "white", "league", etc.
-    # css: ["slides.css"]            # Additional CSS files
-
-    width: 1050
-    height: 700
-    margin: 0.1
-
+  revealjs:   
+    plugins:
+      - search
+      - chalkboard
+      - zoom
+      - menu
+      - anything
+      - title-footer
     #---------------------------------------------------------------------------
     # Navigation
     #---------------------------------------------------------------------------
@@ -129,7 +126,7 @@ format:
     progress: true
     slide-number: true
     show-slide-number: all           # "all", "print", or "speaker"
-    navigation-mode: default         # "default", "linear"
+    navigation-mode: linear         # "vertical", "linear", "grid"
     keyboard: true
     touch: true
     mouse-wheel: false
@@ -184,30 +181,15 @@ format:
     # PDF export (if you do `quarto render ... --to revealjs --to pdf`)
     #---------------------------------------------------------------------------
     pdf-separate-fragments: true
-    pdf-max-pages-per-slide: 1
-
-    #---------------------------------------------------------------------------
-    # Footer, branding, and slide-specific
-    #---------------------------------------------------------------------------
-    logo: null
-    footer: null
+    pdf-max-pages-per-slide: 1  
 
     title-slide-attributes:
-      data-background-image: null
+      data-background-image: ""
       data-background-size: cover
       data-background-opacity: "0.5"
     showNotes: true
 
-    #---------------------------------------------------------------------------
-    # Plugins (Note: must install separately or ensure they ship with Quarto)
-    #---------------------------------------------------------------------------
-    # Quarto can load these if they are available in your environment:
-    revealjs-plugins: ["menu", "chalkboard", "search", "zoom"]
-    menu: true
-    chalkboard: true
-    pointer:
-      pointerSize: 18
-      color: "#FF0000"
+    
 
   #============================================================================
   # 3. DOCX (Word Document) Options

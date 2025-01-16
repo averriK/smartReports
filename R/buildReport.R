@@ -223,13 +223,31 @@ buildReport <- function(
   }
   # Get package resources path
   extdata_path <- system.file("extdata", package = "smartReports")
-  # Create and copy _yml folder
+
+  # 1) Copy _extensions folder (if it exists) from extdata_path to current dir (".")
+  extensions_folder <- file.path(extdata_path, "_extensions")
+  if (dir.exists(extensions_folder)) {
+    file.copy(
+      from = extensions_folder,
+      to = ".",   # copy to top-level working directory
+      recursive = TRUE,
+      overwrite = TRUE
+    )
+    message("Copied _extensions folder to current directory!")
+  }
+
+  # 2) Now copy all other support files/folders into build_dir
   if (!dir.exists(build_dir)) {
     dir.create(build_dir, recursive = TRUE)
-    # Copy support files from extdata to build_dir
+
+    # Exclude the _extensions folder (already handled above)
     files_to_copy <- list.files(extdata_path, full.names = TRUE)
+    files_to_copy <- files_to_copy[basename(files_to_copy) != "_extensions"]
+
+    # Also exclude build_dir itself just in case
     excluded_folder <- basename(build_dir)
     files_to_copy <- files_to_copy[basename(files_to_copy) != excluded_folder]
+
     file.copy(
       from = files_to_copy,
       to = build_dir,
