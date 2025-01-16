@@ -5,22 +5,21 @@
 \title{Build Quarto Report}
 \usage{
 buildReport(
-  home_dir = ".",
   build_dir = "_build",
+  publish_dir = "_publish",
   index_filename = "index.qmd",
   quarto_filename = "_quarto.yml",
   language = "EN",
-  output_format = c("html", "docx"),
+  output_format = c("html"),
   extensions = c("spl", "bst", "cls", "md", "aux", "log", "tex", "jpg", "sty", "docx",
     "pdf", "html"),
-  postRender = TRUE,
-  override = FALSE
+  render = TRUE
 )
 }
 \arguments{
-\item{home_dir}{Path to the home directory.}
-
 \item{build_dir}{Name of the yml folder.}
+
+\item{publish_dir}{Name of the publish folder.}
 
 \item{index_filename}{Name of the index file.}
 
@@ -32,9 +31,7 @@ buildReport(
 
 \item{extensions}{Extensions to be removed.}
 
-\item{postRender}{Logical. Should post-render be performed?}
-
-\item{override}{Logical. Should the YAML file be overridden if it exists?}
+\item{render}{Logical. Should the Quarto document be rendered?}
 }
 \description{
 This function builds the Quarto report, handling pre-render and post-render tasks.

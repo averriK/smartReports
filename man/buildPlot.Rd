@@ -2,20 +2,155 @@
 % Please edit documentation in R/buildPlot.R
 \name{buildPlot}
 \alias{buildPlot}
-\title{Build Plot Function}
+\title{Build a highchart plot}
 \usage{
-buildPlot(data, library = "ggplot2", ...)
+buildPlot(
+  data.lines = NULL,
+  data.points = NULL,
+  line.type = "line",
+  plot.title = NULL,
+  plot.subtitle = NULL,
+  plot.height = NULL,
+  plot.width = NULL,
+  xAxis.legend = "X",
+  yAxis.legend = "Y",
+  group.legend = "ID",
+  color.palette = "Dark 3",
+  line.style = "Solid",
+  point.style = "circle",
+  line.size = 1,
+  point.size = 3,
+  xAxis.log = FALSE,
+  yAxis.log = FALSE,
+  xAxis.reverse = FALSE,
+  yAxis.reverse = FALSE,
+  xAxis.max = NA,
+  yAxis.max = NA,
+  xAxis.min = NA,
+  yAxis.min = NA,
+  xAxis.label = TRUE,
+  yAxis.label = TRUE,
+  legend.layout = "horizontal",
+  legend.align = "right",
+  legend.valign = "top",
+  legend.show = TRUE,
+  plot.save = FALSE,
+  plot.theme = NULL,
+  xAxis.legend.fontsize = "14px",
+  yAxis.legend.fontsize = "14px",
+  group.legend.fontsize = "12px",
+  plot.title.fontsize = "24px",
+  plot.subtitle.fontsize = "18px",
+  print.max.abs = FALSE,
+  point.marker = TRUE,
+  point.dataLabels = FALSE,
+  plot.filename = NULL,
+  interpolation.method = "linear",
+  ...
+)
 }
 \arguments{
-\item{data}{A data.frame containing at least columns named ID, X, and Y.}
+\item{data.lines}{A data.table containing columns "ID", "X", "Y", optional "style", optional "fill".
+If NULL, no lines will be plotted.}
 
-\item{library}{A string specifying which plotting library to use ("ggplot2" or "highcharter").}
+\item{data.points}{A data.table containing columns "ID", "X", "Y", optional "style".
+If NULL, no scatter points will be plotted.}
 
-\item{...}{Additional parameters to customize the plot.}
+\item{line.type}{A string indicating whether lines should be "line" or "spline".
+If an invalid value is provided, it reverts to "line".}
+
+\item{plot.title}{A string for the plot title}
+
+\item{plot.subtitle}{A string for the plot subtitle}
+
+\item{plot.height}{A numeric for the plot height}
+
+\item{plot.width}{A numeric for the plot width}
+
+\item{xAxis.legend}{A string for the x-axis legend}
+
+\item{yAxis.legend}{A string for the y-axis legend}
+
+\item{group.legend}{A string for the group legend}
+
+\item{color.palette}{A string for the color palette (must exist in grDevices::hcl.pals())}
+
+\item{line.style}{Deprecated; line styles are taken from data.lines$style.
+However, a default style is used if data.lines$style is missing or invalid.}
+
+\item{point.style}{Deprecated; point styles are taken from data.points$style.
+However, a default style is used if data.points$style is missing or invalid.}
+
+\item{line.size}{A numeric for the line width}
+
+\item{point.size}{A numeric for the point size}
+
+\item{xAxis.log}{A logical for the x-axis log scale}
+
+\item{yAxis.log}{A logical for the y-axis log scale}
+
+\item{xAxis.reverse}{A logical for the x-axis reverse}
+
+\item{yAxis.reverse}{A logical for the y-axis reverse}
+
+\item{xAxis.max}{A numeric for the x-axis max}
+
+\item{yAxis.max}{A numeric for the y-axis max}
+
+\item{xAxis.min}{A numeric for the x-axis min}
+
+\item{yAxis.min}{A numeric for the y-axis min}
+
+\item{xAxis.label}{A logical for the x-axis label}
+
+\item{yAxis.label}{A logical for the y-axis label}
+
+\item{legend.layout}{A string for the legend layout}
+
+\item{legend.align}{A string for the legend align}
+
+\item{legend.valign}{A string for the legend valign}
+
+\item{legend.show}{A logical for the legend show}
+
+\item{plot.save}{A logical for the plot save}
+
+\item{plot.theme}{A highchart theme object}
+
+\item{xAxis.legend.fontsize}{A string for the x-axis legend fontsize}
+
+\item{yAxis.legend.fontsize}{A string for the y-axis legend fontsize}
+
+\item{group.legend.fontsize}{A string for the group legend fontsize}
+
+\item{plot.title.fontsize}{A string for the plot title fontsize}
+
+\item{plot.subtitle.fontsize}{A string for the plot subtitle fontsize}
+
+\item{print.max.abs}{A logical for printing max absolute Y labels as annotations (only for lines)}
+
+\item{point.marker}{Deprecated; point markers are now controlled via data.points$style.}
+
+\item{point.dataLabels}{A logical for whether data labels appear for points}
+
+\item{plot.filename}{A string for the plot filename, if saving}
+
+\item{interpolation.method}{A string specifying the interpolation method used by approx().
+Defaults to "linear". Other valid values include "constant", "spline", etc.
+For large datasets, you can also consider downsampling or chunking externally.}
+
+\item{...}{Additional arguments (unused)}
 }
 \value{
-A plot object from the specified library.
+A highchart object if either data.lines or data.points is provided.
+Returns NULL if both are NULL, with a soft warning.
 }
 \description{
-A function to create plots using either ggplot2 or highcharter libraries.
+Build a highchart plot using separate data sources for lines and points.
+
+Supports the plotting of line and scatter series. Includes optional arearange shading between
+two line groups if indicated in data.lines$fill and interpolation is handled via the approx function
+(which can be customized using the interpolation.method argument). Fallback behaviors:
+if an invalid line.type is provided, "line" is used; if an invalid or missing line style is found,
+"solid" is used; if an invalid color.palette is provided, a default Highcharts palette is chosen.
 }
