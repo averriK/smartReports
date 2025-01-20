@@ -1,116 +1,161 @@
-/* custom.css */
+:root {
+  --orange: #ff9900;
+  --black: #000000;
+  --dark-grey: #333333; /* Standard dark grey */
+  --medium-grey: #666666; /* Medium grey */
+  --light-grey: #999999; /* Light grey */
+  --white: #ffffff;
+}
 
+/* 1) Base Reveal.js styling (only for slides) */
 .reveal .slides {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* Justify content to the left */
-  width: 100%; /* Ensure content takes full width */
-  position: relative; /* Allow for positioning the logo within */
-  padding: 20px 150px 120px 20px !important; /* Adjust padding (top/right/bottom/left) */
-  margin-top: 30px; /* Increased top margin to accommodate the logo */
-  margin-bottom: 20px; /* Adjust bottom margin as needed */
+  font-family: Arial, sans-serif;
+  font-size: 20px; /* PPTx default font size */
+  color: var(--black);
+  background-color: var(--white);
 }
 
-/* Background logo styling */
-.reveal .slides {
-  background-image: url('logo.png'); 
-  background-repeat: no-repeat;
-  background-position: bottom 100px right 30px; /* Position at bottom right */
-  background-size: 250px auto; 
+/* Force slides to start from the very top */
+.reveal .slides > section,
+.reveal .slides > section > section {
+  top: 0 !important;
+  transform: none !important;
+  padding-top: 0 !important; /* Zero top padding */
 }
 
+/* ──────────────────────────────────────────────────────────────────
+   1) Top-left alignment for slide content 
+      (already in your CSS snippet).
+   ────────────────────────────────────────────────────────────────── */
+   .reveal .slide {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    /* Slightly shorter height so we can add padding for pinned elements */
+    height: 80%;
+    /* Minimal side padding, can increase if text is too close to edges */
+    padding: 0.1em !important;
+    /* IMPORTANT: Provide enough bottom padding to avoid overlapping pinned footer/logo */
+    padding-bottom: 80px !important; /* The extra 70px ensures your content sits above the pinned logo.     Adjust as needed if your logo is bigger or you want more padding. */
+  }
 
-/* Slide number styling */
-.reveal .slide-number {
-  color: #999;
-  font-size: 0.8em;
-}
-
-/* Header and footer styling */
-.reveal-header, .reveal .footer {
-  position: fixed;
-  width: 100%;
-  text-align: center;
-  font-size: 0.9em;
-  color: #666;
-  background: white;
-  z-index: 1000;
-  padding: 10px 0;
-}
-
-
-
-/* General styling */
-.reveal {
-  font-family: 'Arial', sans-serif; /* Consistent font family */
-}
-
-/* Heading styling with Arial Black */
-.reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {  
-  text-align: left;
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
-  color: #333; /* Adjusted to darker color for better contrast */
-}
-
-/* Specific heading sizes and spacing */
-.reveal h1 {
-  font-family: 'Arial Black', Arial, sans-serif;
-  font-size: 4.5em !important; /* Adjust font size for h1 */
-  margin-bottom: 0.5em !important; /* Add spacing */
-}
-
+/* 2) Only H2 has the orange border, pinned at top, no top margin.
+   But we add some margin-bottom for normal slides to create "air." */
 .reveal h2 {
-  font-family:  Arial, sans-serif;
-  font-size: 3.5em !important; /* Adjust font size for h2 */
-  margin-bottom: 0.5em !important; /* Add spacing */
+  margin-top: 0 !important;
+  margin-bottom: 20px !important;   /* Extra spacing ("air") below the heading */
+  border-left: 4px solid var(--orange);
+  padding-left: 12px;
+  position: relative !important;
+  top: 0 !important;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 32px;
+  color: var(--black);
 }
 
-.reveal h3 {
-  font-family:  Arial, sans-serif;
-  font-size: 2.5em !important; /* Font size for h3 */
-  margin-bottom: 0.5em !important; /* Add spacing */
+/* H3, H4, and H5 have no orange border. */
+.reveal h3,
+.reveal h4,
+.reveal h5 {
+  border-left: none !important;
+  margin-top: 15px;
+  margin-bottom: 0.6em;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  color: var(--black);
+  padding-left: 12px;
 }
 
-.reveal h4 {
-  font-family:  Arial, sans-serif;
-  font-size: 2.0em !important; /* Font size for h4 */
-  margin-bottom: 0.5em !important; /* Add spacing */
+/* 3) Cover slide (#coverSlide) overrides */
+.reveal #coverSlide {
+  /* Vertically center everything within the slide's height,
+     but keep text left-aligned */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important; /* Centers vertically */
+  align-items: flex-start !important;  /* Left alignment */
+  height: 100% !important;
+  margin: 0;            /* Remove defaults */
+  padding: 0 !important; /* Remove top padding so full vertical centering works */
+  text-align: left;
 }
 
-/* Text and caption styling */
-.reveal p, .reveal figcaption {
-  font-size: 1.5em !important; /* Adjust font size for text and captions */
-  margin-bottom: 0.5em !important; /* Add spacing */
+/* Cover slide H2: bigger if desired, same orange border from .reveal h2, 
+   but can override font size or spacing here */
+.reveal #coverSlide h2 {
+  font-size: 40px !important;  /* Larger cover title */
+  margin-bottom: 0 !important; /* Tighter spacing before subtitle */
+  line-height: 1.2 !important; /* Adjust spacing as needed */
 }
 
-/* Figure styling */
-.reveal .figure {
-  max-width: 100%;
-  height: auto;
-  margin: 0 auto;
-  padding: 10px 0;
+/* Cover slide H3: no orange border, explicitly in orange text */
+.reveal #coverSlide h3 {
+  font-weight: normal;
+  font-size: 28px;
+  color: var(--orange) !important; /* Subtitle in orange */
+  margin-top: 0.2em;
+  margin-bottom: 0.6em;
 }
 
-/* Left align tables and table content */
-.reveal .slides table {
-  margin-left: 0; /* Remove any default table margins */
-  width: auto; /* Allow tables to adjust width to content */
+/* Cover slide H4: author line, no orange border */
+.reveal #coverSlide h4 {
+  font-weight: normal;
+  font-size: 20px;
+  color: var(--medium-grey);
+  margin-top: 40px;
+  margin-bottom: 0.2em;
 }
 
-
-/* Tabset styling */
-.tabset .nav-link {
-  font-size: 2.5em; /* Adjust as needed */
-  padding: 10px 15px; /* Adjust padding as needed */
+/* Hide slide number & footer on cover slide only */
+.reveal section#coverSlide .slide-number,
+.reveal section#coverSlide footer {
+  display: none;
 }
 
-.tabset .tab-pane {
-  font-size: 2.5em; /* Adjust as needed */
-}
+/* ──────────────────────────────────────────────────────────────────
+   3) Pinned logo at the bottom-right corner
+   (with some padding from edges).
+   ────────────────────────────────────────────────────────────────── */
+   .reveal .slide-logo {
+    position: fixed !important;
+    bottom: 20px !important; /* 20px space from bottom edge */
+    right: 20px !important;  /* 20px space from right edge */
+    max-height: 60px !important; /* lock a consistent logo height */
+    width: auto !important;      /* maintain aspect ratio */
+    z-index: 9999 !important;
+    margin: 0 !important;
+  }
 
-.tabset .nav-tabs {
-  font-size: 2.5em; /* Adjust as needed */
-  padding: 10px 0; /* Adjust as needed */
-}
+
+/* ──────────────────────────────────────────────────────────────────
+   2) Centered footer styling 
+   (your existing snippet with bottom spacing).
+   ────────────────────────────────────────────────────────────────── */
+   .reveal footer,
+   .reveal .footer {
+     position: fixed !important;      /* pinned at the bottom */
+     bottom: 20px !important;         /* 20px space from bottom edge */
+     left: 50% !important;            /* center horizontally */
+     transform: translateX(-50%) !important;  /* perfect center alignment */
+     font-size: 12px !important;
+     font-family: Arial, sans-serif !important;
+     font-weight: normal !important;
+     color: var(--medium-grey) !important;
+     z-index: 9999; /* ensure footer is on top of slide content */
+   }
+   
+/* 
+   ─────────────────────────────────────────────────────────────
+   4) Slide number styling
+   ─────────────────────────────────────────────────────────────
+*/
+.reveal .slide-number {
+  position: fixed !important;
+  right: 20px !important;
+  bottom: 20px !important;
+  font-size: 14px;
+  color: var(--medium-grey);
+  }
 

@@ -1,0 +1,115 @@
+#===============================================================================
+# REVEALJS PRESENTATION CONFIG
+#===============================================================================
+format:
+  revealjs:
+    #-------------------------------------------------------------------------
+    # Slide Formatting
+    #-------------------------------------------------------------------------
+    # Provide an auto-generated HTML output file name:
+    output-file: "index.html"
+    
+    # Use one of the built-in themes (simple, white, black, etc.),
+    # or a custom theme file.
+    theme: "simple"   
+    
+    # Eliminate default margins around slides and align from top-left
+    margin: 0
+    center: false
+    
+    # Force a 16:9 aspect ratio by specifying width & height under revealOptions
+    revealOptions:
+      width: 1280          # Typical 16:9 width
+      height: 1080 #720          # Typical 16:9 height
+    
+    # Enable scrolling for tall slides
+    scrollable: true
+    
+    #-------------------------------------------------------------------------
+    # Slide Navigation
+    #-------------------------------------------------------------------------
+    # Enables next/previous buttons at the bottom corner.
+    controls: true
+    
+    # Show a progress bar at the bottom of the slides.
+    progress: true
+
+    # Keyboard/touch interactions for changing slides
+    keyboard: true
+    touch: true
+
+    # Hash-URLs allow linking to a specific slide.
+    hash: true
+    
+    # By default, do not loop or extend browser history
+    loop: false
+    history: false
+
+    #-------------------------------------------------------------------------
+    # Slide Transitions
+    #-------------------------------------------------------------------------
+    # transition can be "none", "fade", "slide", "convex", "concave", or "zoom"
+    transition: "fade"
+    transition-speed: "default"
+    background-transition: "fade"
+
+    #-------------------------------------------------------------------------
+    # Content Features
+    #-------------------------------------------------------------------------
+    # If you want bullet points to appear one by one, use fragments: true
+    fragments: true
+    
+    # If set to false, the link to highlight fragments in the URL is removed
+    fragment-in-url: true
+
+    #-------------------------------------------------------------------------
+    # Code Blocks
+    #-------------------------------------------------------------------------
+    # "github", "dracula", "zenburn", etc. 
+    highlight-style: "github"
+    code-line-numbers: true
+    code-copy: true
+    code-overflow: "scroll"
+
+    #-------------------------------------------------------------------------
+    # Slide Number and Footer
+    #-------------------------------------------------------------------------
+    # Show slide numbers in the lower-left corner (c/t => current/total).
+    slide-number: "c/t"
+
+    # You can also reposition slide numbers in CSS, e.g. bottom-right corner.
+    
+    # A blank footer (or remove to not define it at all).
+    footer: ""
+    
+    #-------------------------------------------------------------------------
+    # Additional Plugins
+    #-------------------------------------------------------------------------
+    plugins:
+      - search
+      - chalkboard
+      - zoom
+      - menu
+    
+    # Enable plugin features
+    chalkboard: true
+    search: true
+    menu: true
+    zoom: true
+
+    #-------------------------------------------------------------------------
+    # PDF Export
+    #-------------------------------------------------------------------------
+    # If you render to PDF, each fragment becomes a new page with pdf-separate-fragments: true
+    pdf-separate-fragments: true
+    pdf-max-pages-per-slide: 1
+
+    #-------------------------------------------------------------------------
+    # Title Slide Attributes
+    #-------------------------------------------------------------------------
+    # Optionally style the default title slide background or image
+    title-slide-attributes:
+      data-background-image: ""
+      data-background-size: cover
+      data-background-opacity: "0.5"
+
