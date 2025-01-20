@@ -20,8 +20,11 @@ format:
     # Force a 16:9 aspect ratio by specifying width & height under revealOptions
     revealOptions:
       width: 1280          # Typical 16:9 width
-      height: 720          # Typical 16:9 height
-
+      height: 1080 #720          # Typical 16:9 height
+    
+    # Enable scrolling for tall slides
+    scrollable: true
+    
     #-------------------------------------------------------------------------
     # Slide Navigation
     #-------------------------------------------------------------------------
