@@ -1,30 +1,33 @@
-/* 1. Global color vars */
 :root {
   --orange: #ff9900;
   --black: #000000;
-  --dark-grey: #333333;    /* Standard dark grey */
-  --medium-grey: #666666;  /* Medium grey */
-  --light-grey: #999999;   /* Light grey */
+  --dark-grey: #333333; /* Standard dark grey */
+  --medium-grey: #666666; /* Medium grey */
+  --light-grey: #999999; /* Light grey */
   --white: #ffffff;
 }
 
-/* 2. Base styling and disable vertical centering */
+/*
+  If you have extra styles for HTML or DOCX, add them outside .reveal.
+*/
+
+/* 1) Base Reveal.js styling (only for slides) */
 .reveal .slides {
   font-family: Arial, sans-serif;
   font-size: 16px;
   color: var(--black);
-  background-color: #ffffff;
+  background-color: var(--white);
 }
 
 /* Force slides to start from top */
-.reveal .slides > section, 
+.reveal .slides > section,
 .reveal .slides > section > section {
   top: 0 !important;
   transform: none !important;
-  padding-top: 40px !important;  /* Add padding at top of each slide */
+  padding-top: 40px !important; /* Add padding at top of each slide */
 }
 
-/* Force slide content to flow from top */
+/* Force slide content to flow from the top */
 .reveal .slide {
   height: 100%;
   display: flex !important;
@@ -33,137 +36,106 @@
   justify-content: flex-start !important;
 }
 
-/* 3. Custom cover slide (#coverSlide) */
-/* Special handling for cover slide - override the top alignment */
-#coverSlide.slide {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;  /* Center vertically */
-  padding-top: 0 !important;  /* Remove top padding */
-}
-
-#coverSlide section {
-  transform: none !important;
-  top: 0 !important;
-  text-align: left !important;  /* Align text to left */
-  padding-left: 40px !important;  /* Add some left padding */
-}
-
-/* Cover slide Part */
-#coverSlide h1 {
-  position: static !important;  /* Remove fixed positioning */
-  margin-top: 0 !important;
-  text-align: center;
-}
-
-/* Cover slide title and subtitle */
-#coverSlide h2 {
-  position: static !important;  /* Remove fixed positioning */
-  margin-top: 0 !important;
-  text-align: left;
-}
-
-#coverSlide h3,
-#coverSlide h4 {
-  text-align: left;
-}
-
-
-/* Part 46px, bold, black */
-#coverSlide h1 {
-  font-family: Arial, sans-serif;
-  font-weight: bold; 
-  font-size: 48px;
-  color: var(--black);
-  margin-bottom: 0.5em;
-}
-
-/* 3a. Title: 46px, bold, black */
-#coverSlide h2 {
-  font-family: Arial, sans-serif;
-  font-weight: bold; 
-  font-size: 40px;
-  color: var(--black);
-  margin-bottom: 0em;
-}
-
-/* 3b. Subtitle: 30px, normal, orange */
-#coverSlide h3 {
-  font-family: Arial, sans-serif;
-  font-weight: normal;
-  font-size: 28px;
-  color: var(--orange);
-  margin-top: 0;
-  margin-bottom: 0em;
-}
-
-/* 3c. Author (h4) */
-#coverSlide h4 {
-  font-family: Arial, sans-serif;
-  font-weight: normal;
-  font-size: 22px; 
-  color: var(--black);
-  margin-top: 1.5em;
-}
-
-/* 3d. Hide slide number & footer on the cover */
-section#coverSlide .slide-number {
-  display: none;
-}
-section#coverSlide footer {
-  display: none;
-}
-
-/* Position headers at top */
+/* 2) h2: orange border, pinned top, 40px bottom margin */
 .reveal h2 {
   position: relative !important;
   top: 0 !important;
   margin-top: 0 !important;
-  margin-bottom: 40px !important;  /* Space after header */
+  margin-bottom: 40px !important;
+  border-left: 4px solid var(--orange);
+  padding-left: 12px;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  color: var(--black);
+  font-size: 32px; /* Normal slides h2 size */
 }
 
+/* 3) h3: orange border, normal margins */
+.reveal h3 {
+  margin-top: 15px;
+  margin-bottom: 0.6em;
+  border-left: 4px solid var(--orange);
+  padding-left: 12px;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  color: var(--black);
+  font-size: 28px; /* Normal slides h3 size */
+}
 
-/* 4. Normal slide headings (including # if placed after cover) */
-.reveal h2,
-.reveal h3,
-.reveal h4,
+/* 4) h4/h5: no orange border */
+.reveal h4 {
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  color: var(--black);
+  font-size: 24px;
+  margin-top: 15px;
+  margin-bottom: 0.6em;
+  padding-left: 12px;
+}
+
 .reveal h5 {
   font-family: Arial, sans-serif;
   font-weight: bold;
-  border-left: 4px solid var(--orange);
-  padding-left: 12px;
+  color: var(--black);
+  font-size: 20px;
   margin-top: 15px;
   margin-bottom: 0.6em;
+  padding-left: 12px;
+}
+
+/* 5) Cover slide (#coverSlide) in Reveal.js */
+.reveal #coverSlide {
+  text-align: left;
+  padding-top: 60px; /* Adjust as desired */
+}
+
+/* Make cover slide h2 bigger if desired */
+.reveal #coverSlide h2 {
+  font-size: 40px; /* Override cover title size */
+  line-height: 1.2;
+  margin-bottom: 0; /* Minimizes gap before next element */
+}
+
+/* Example cover slide h3 (no orange border) */
+.reveal #coverSlide h3 {
+  font-weight: normal;
+  font-size: 28px;
+  color: var(--black);
+  margin-top: 0.5em;
+}
+
+/* Similar for h4, if needed */
+.reveal #coverSlide h4 {
+  font-weight: normal;
+  font-size: 20;
+  margin-top: 2em;
   color: var(--black);
 }
 
-/* Standard heading sizes on normal slides */
-.reveal h2 { font-size: 32px; }
-.reveal h3 { font-size: 28px; }
-.reveal h4 { font-size: 24px; }
-.reveal h5 { font-size: 20px; }
-
-
-
-
-/* Logo area */
-.reveal .slide-logo {
-  max-height: none !important;
-  max-width: 400px !important;
-  height: auto !important;
-  bottom: 20px;
-  position: fixed !important;
+/* Hide slide number & footer on cover slide only */
+.reveal section#coverSlide .slide-number,
+.reveal section#coverSlide footer {
+  display: none;
 }
 
-/* Footer styling */
-.reveal footer,
-.reveal .footer {
-  position: fixed !important;
-  bottom: 20px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  font-size: 12px !important;
-  font-family: Arial !important;
+/* Example pinned logo or footer: */
+.reveal .slide-logo {
+    max-height: none !important;
+    max-width: 400px !important;
+    height: auto !important;
+    bottom: 20px;
+    position: fixed !important;
+  }
+
+
+  .reveal footer,
+  .reveal .footer {
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    font-size: 12px !important;
+  font-family: Arial, sans-serif !important;
   font-weight: normal !important;
   color: var(--medium-grey) !important;
 }
