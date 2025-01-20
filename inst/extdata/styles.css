@@ -7,109 +7,98 @@
   --white: #ffffff;
 }
 
-/*
-  If you have extra styles for HTML or DOCX, add them outside .reveal.
-*/
-
 /* 1) Base Reveal.js styling (only for slides) */
 .reveal .slides {
   font-family: Arial, sans-serif;
-  font-size: 16px;
+  font-size: 20px; /* PPTx default font size */
   color: var(--black);
   background-color: var(--white);
 }
 
-/* Force slides to start from top */
+/* Force slides to start from the very top */
 .reveal .slides > section,
 .reveal .slides > section > section {
   top: 0 !important;
   transform: none !important;
-  padding-top: 40px !important; /* Add padding at top of each slide */
+  padding-top: 0 !important; /* Zero top padding */
 }
 
-/* Force slide content to flow from the top */
+/* Force slide content to begin at top-left */
 .reveal .slide {
-  height: 100%;
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
   justify-content: flex-start !important;
+  height: 100%;
+  padding: 0.1em !important; /* Narrower side padding */
 }
 
-/* 2) h2: orange border, pinned top, 40px bottom margin */
+/* 2) Only H2 has the orange border, pinned at top, no top margin.
+   But we add some margin-bottom for normal slides to create "air." */
 .reveal h2 {
+  margin-top: 0 !important;
+  margin-bottom: 20px !important;   /* Extra spacing ("air") below the heading */
+  border-left: 4px solid var(--orange);
+  padding-left: 12px;
   position: relative !important;
   top: 0 !important;
-  margin-top: 0 !important;
-  margin-bottom: 40px !important;
-  border-left: 4px solid var(--orange);
-  padding-left: 12px;
   font-family: Arial, sans-serif;
   font-weight: bold;
+  font-size: 32px;
   color: var(--black);
-  font-size: 32px; /* Normal slides h2 size */
 }
 
-/* 3) h3: orange border, normal margins */
-.reveal h3 {
-  margin-top: 15px;
-  margin-bottom: 0.6em;
-  border-left: 4px solid var(--orange);
-  padding-left: 12px;
-  font-family: Arial, sans-serif;
-  font-weight: bold;
-  color: var(--black);
-  font-size: 28px; /* Normal slides h3 size */
-}
-
-/* 4) h4/h5: no orange border */
-.reveal h4 {
-  font-family: Arial, sans-serif;
-  font-weight: bold;
-  color: var(--black);
-  font-size: 24px;
-  margin-top: 15px;
-  margin-bottom: 0.6em;
-  padding-left: 12px;
-}
-
+/* H3, H4, and H5 have no orange border. */
+.reveal h3,
+.reveal h4,
 .reveal h5 {
+  border-left: none !important;
+  margin-top: 15px;
+  margin-bottom: 0.6em;
   font-family: Arial, sans-serif;
   font-weight: bold;
   color: var(--black);
-  font-size: 20px;
-  margin-top: 15px;
-  margin-bottom: 0.6em;
   padding-left: 12px;
 }
 
-/* 5) Cover slide (#coverSlide) in Reveal.js */
+/* 3) Cover slide (#coverSlide) overrides */
 .reveal #coverSlide {
+  /* Vertically center everything within the slide's height,
+     but keep text left-aligned */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important; /* Centers vertically */
+  align-items: flex-start !important;  /* Left alignment */
+  height: 100% !important;
+  margin: 0;            /* Remove defaults */
+  padding: 0 !important; /* Remove top padding so full vertical centering works */
   text-align: left;
-  padding-top: 60px; /* Adjust as desired */
 }
 
-/* Make cover slide h2 bigger if desired */
+/* Cover slide H2: bigger if desired, same orange border from .reveal h2, 
+   but can override font size or spacing here */
 .reveal #coverSlide h2 {
-  font-size: 40px; /* Override cover title size */
-  line-height: 1.2;
-  margin-bottom: 0; /* Minimizes gap before next element */
+  font-size: 40px !important;  /* Larger cover title */
+  margin-bottom: 0 !important; /* Tighter spacing before subtitle */
+  line-height: 1.2 !important; /* Adjust spacing as needed */
 }
 
-/* Example cover slide h3 (no orange border) */
+/* Cover slide H3: no orange border, explicitly in orange text */
 .reveal #coverSlide h3 {
   font-weight: normal;
   font-size: 28px;
-  color: var(--black);
-  margin-top: 0.5em;
+  color: var(--orange) !important; /* Subtitle in orange */
+  margin-top: 0.2em;
+  margin-bottom: 0.6em;
 }
 
-/* Similar for h4, if needed */
+/* Cover slide H4: author line, no orange border */
 .reveal #coverSlide h4 {
   font-weight: normal;
-  font-size: 20;
-  margin-top: 2em;
-  color: var(--black);
+  font-size: 20px;
+  color: var(--medium-grey);
+  margin-top: 40px;
+  margin-bottom: 0.2em;
 }
 
 /* Hide slide number & footer on cover slide only */
@@ -139,3 +128,12 @@
   font-weight: normal !important;
   color: var(--medium-grey) !important;
 }
+
+.reveal .slide-number {
+  position: fixed !important;
+  right: 20px !important;
+  bottom: 20px !important;
+  font-size: 14px;
+  color: var(--medium-grey);
+  }
+

@@ -1,90 +1,112 @@
-#============================================================================
-# 2. Reveal.js (Presentation) Options
-#============================================================================
+#===============================================================================
+# REVEALJS PRESENTATION CONFIG
+#===============================================================================
 format:
   revealjs:
-    theme: "simple"    
-    vertical-align: "top"
-    logo: "_build/srk_white.png"
-    logo-placement: "bottom-right"
-    logo-link: "https://www.srk.com"
-    logo-width: 320
-    center-title-slide: false # pad to left
-    title-slide: false # OMIT TITLE SLIDE 
-    footer: ""
-    footer-placement: "bottom"  # Position of the footer
-    slide-number: true
-    title-footer: false
-    showNotes: true
-    show-footer: true           # Toggle footer visibility
-    # Timing / auto-sliding
-    auto-slide: 0                    # If non-zero, auto progression in ms
-    auto-slide-stoppable: true
+    #-------------------------------------------------------------------------
+    # Slide Formatting
+    #-------------------------------------------------------------------------
+    # Provide an auto-generated HTML output file name:
+    output-file: "index.html"
+    
+    # Use one of the built-in themes (simple, white, black, etc.),
+    # or a custom theme file.
+    theme: "simple"   
+    
+    # Eliminate default margins around slides and align from top-left
+    margin: 0
     center: false
-    overview: true
-   #---------------------------------------------------------------------------
-    # Navigation
-    #---------------------------------------------------------------------------
+    
+    # Force a 16:9 aspect ratio by specifying width & height under revealOptions
+    revealOptions:
+      width: 1280          # Typical 16:9 width
+      height: 720          # Typical 16:9 height
+
+    #-------------------------------------------------------------------------
+    # Slide Navigation
+    #-------------------------------------------------------------------------
+    # Enables next/previous buttons at the bottom corner.
     controls: true
-    controls-layout: bottom-right    # "edges" or "bottom-right" are typical
-    controls-tutorial: true
-    controls-back-arrows: faded      # "faded", "hidden", "visible"
+    
+    # Show a progress bar at the bottom of the slides.
     progress: true
+
+    # Keyboard/touch interactions for changing slides
     keyboard: true
     touch: true
-    mouse-wheel: false
-    loop: false
-    rtl: false
-    hash: true
-    history: false
-     
-    transition: "slide"                # "none", "fade", "slide", "convex", "concave", "zoom"
-    transition-speed: "default"        # "default", "fast", "slow"
-    background-transition: "fade"      # "none", "fade", "slide", "convex", "concave", "zoom"
 
-    #---------------------------------------------------------------------------
-    # Content features
-    #---------------------------------------------------------------------------
-    preview-links: false
-    fragments: true
-    fragment-in-url: true    
-    auto-stretch: false
+    # Hash-URLs allow linking to a specific slide.
+    hash: true
     
-    output-file: "index.html"
+    # By default, do not loop or extend browser history
+    loop: false
+    history: false
+
+    #-------------------------------------------------------------------------
+    # Slide Transitions
+    #-------------------------------------------------------------------------
+    # transition can be "none", "fade", "slide", "convex", "concave", or "zoom"
+    transition: "fade"
+    transition-speed: "default"
+    background-transition: "fade"
+
+    #-------------------------------------------------------------------------
+    # Content Features
+    #-------------------------------------------------------------------------
+    # If you want bullet points to appear one by one, use fragments: true
+    fragments: true
+    
+    # If set to false, the link to highlight fragments in the URL is removed
+    fragment-in-url: true
+
+    #-------------------------------------------------------------------------
+    # Code Blocks
+    #-------------------------------------------------------------------------
+    # "github", "dracula", "zenburn", etc. 
+    highlight-style: "github"
+    code-line-numbers: true
+    code-copy: true
+    code-overflow: "scroll"
+
+    #-------------------------------------------------------------------------
+    # Slide Number and Footer
+    #-------------------------------------------------------------------------
+    # Show slide numbers in the lower-left corner (c/t => current/total).
+    slide-number: "c/t"
+
+    # You can also reposition slide numbers in CSS, e.g. bottom-right corner.
+    
+    # A blank footer (or remove to not define it at all).
+    footer: ""
+    
+    #-------------------------------------------------------------------------
+    # Additional Plugins
+    #-------------------------------------------------------------------------
     plugins:
       - search
       - chalkboard
       - zoom
       - menu
+    
+    # Enable plugin features
     chalkboard: true
-    search: true    
+    search: true
     menu: true
     zoom: true
-    
-    #---------------------------------------------------------------------------
-    # Footer settings
-    #---------------------------------------------------------------------------
-    
-    
-    #---------------------------------------------------------------------------
-    # Code blocks
-    #---------------------------------------------------------------------------
-    highlight-style: github          # "github", "dracula", "zenburn", "github", "dracula", "zenburn", etc.
-    highlight-lines: false           # Quarto does not have robust highlight-lines for Reveal yet
-    code-fold: false
-    code-line-numbers: true
-    code-copy: true
-    code-overflow: scroll
 
-    #---------------------------------------------------------------------------
-    # PDF export (if you do `quarto render ... --to revealjs --to pdf`)
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
+    # PDF Export
+    #-------------------------------------------------------------------------
+    # If you render to PDF, each fragment becomes a new page with pdf-separate-fragments: true
     pdf-separate-fragments: true
-    pdf-max-pages-per-slide: 1  
+    pdf-max-pages-per-slide: 1
 
+    #-------------------------------------------------------------------------
+    # Title Slide Attributes
+    #-------------------------------------------------------------------------
+    # Optionally style the default title slide background or image
     title-slide-attributes:
       data-background-image: ""
       data-background-size: cover
       data-background-opacity: "0.5"
-    
 
