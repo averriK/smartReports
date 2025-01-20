@@ -26,9 +26,7 @@ buildReport <- function(
     extensions = c("spl", "bst", "cls", "md", "aux", "log", "tex", "jpg", "sty","docx", "pdf", "html"),
     render = TRUE
 ) {
-  . <- NULL
-  
-  
+  . <- NULL 
   
   # Pre-render function
   .preRender <- function() {
@@ -92,31 +90,93 @@ buildReport <- function(
       }
       DATA <- .merge(DATA, FIELD)
     }
+
+    # HTML
+    if ("html" %in% output_format) {
+      FILE <- list.files(".", pattern = "_html\\.yml$", recursive = TRUE, full.names = TRUE)
+      if (length(FILE) > 0) {
+        FIELD <- read_yaml(FILE[1], readLines.warn = FALSE)
+        FIELD$format <- FIELD$format[names(FIELD$format) %in% output_format]
+        DATA <- .merge(DATA, FIELD)
+      } else {stop("No yaml headers file found")}
+    }
+      
     
-    # Format-specific settings
-    FILE <- list.files(".", pattern = "_format\\.yml$", recursive = TRUE, full.names = TRUE)
-    if (length(FILE) > 0) {
-      FIELD <- read_yaml(FILE[1], readLines.warn = FALSE)
-      FIELD$format <- FIELD$format[names(FIELD$format) %in% output_format]
-      if ("els-pdf" %in% output_format && is.null(FIELD$format$`els-pdf`$journal$name)) {
-        FIELD$format$`els-pdf`$journal$name <- gsub(DATA$subtitle, pattern = "\n", replacement = "")
+    # Reveal.js
+    if ("revealjs" %in% output_format) {
+      FILE <- list.files(".", pattern = "_revealjs\\.yml$", recursive = TRUE, full.names = TRUE)
+      if (length(FILE) > 0) {
+        FIELD <- read_yaml(FILE[1], readLines.warn = FALSE)
+        FIELD$format <- FIELD$format[names(FIELD$format) %in% output_format]
+        DATA <- .merge(DATA, FIELD)
+      } else {stop("No yaml headers file found")}
+      
+    }
+    
+    # DOCX
+    if ("docx" %in% output_format) {
+      FILE <- list.files(".", pattern = "_docx\\.yml$", recursive = TRUE, full.names = TRUE)
+      if (length(FILE) > 0) {
+        FIELD <- read_yaml(FILE[1], readLines.warn = FALSE)
+        FIELD$format <- FIELD$format[names(FIELD$format) %in% output_format]
+        DATA <- .merge(DATA, FIELD)
+      } else {stop("No yaml headers file found")}
+      # Styles for DOCX
+      FILE <- list.files(".", pattern = "\\.docx$", recursive = TRUE, full.names = TRUE)
+      if (length(FILE) > 0) {
+        DOCSTYLE <- file.path(build_dir, basename(FILE[1]))
+        FIELD <- list(format = list(docx = list("reference-doc" = DOCSTYLE)))
+        DATA <- .merge(DATA, FIELD)
       }
-      DATA <- .merge(DATA, FIELD)
+      
     }
     
-    # Styles for DOCX
-    FILE <- list.files(".", pattern = "styles\\.docx$", recursive = TRUE, full.names = TRUE)
-    if (length(FILE) > 0 && "docx" %in% output_format) {
-      FIELD <- list(format = list(docx = list('reference-doc' = FILE[1])))
-      DATA <- .merge(DATA, FIELD)
+    
+    # Elsevier PDF
+    if ("els-pdf" %in% output_format) {
+      FILE <- list.files(".", pattern = "_els-pdf\\.yml$", recursive = TRUE, full.names = TRUE)
+      if (length(FILE) > 0) {
+        FIELD <- read_yaml(FILE[1], readLines.warn = FALSE)
+        FIELD$format <- FIELD$format[names(FIELD$format) %in% output_format]
+        if (is.null(FIELD$format$`els-pdf`$journal$name)) {
+          FIELD$format$`els-pdf`$journal$name <- gsub(DATA$subtitle, pattern = "\n", replacement = "")
+        }
+        DATA <- .merge(DATA, FIELD)
+      }
     }
     
-    # Styles for HTML
-    FILE <- list.files(".", pattern = "styles\\.css$", recursive = TRUE, full.names = TRUE)
-    if (length(FILE) > 0 && "html" %in% output_format) {
-      FIELD <- list(format = list(html = list(css = FILE[1])))
-      DATA <- .merge(DATA, FIELD)
-    }
+   # Detect PNG files
+   FILE <- list.files(".", pattern = "logo\\.png$", recursive = TRUE, full.names = TRUE)
+   if (length(FILE) > 0) {
+     # Suppose you specifically want the first PNG to be your 'logo'
+     LOGO <- file.path(build_dir, basename(FILE[1]))
+     if ("html" %in% output_format) {
+       FIELD <- list(format = list(html = list(logo = LOGO)))
+       DATA <- .merge(DATA, FIELD)
+     }
+     if ("revealjs" %in% output_format) {
+       FIELD <- list(format = list(revealjs = list(logo = LOGO)))
+       DATA <- .merge(DATA, FIELD)
+     }
+   }
+
+   # Detect CSS files
+   FILE <- list.files(".", pattern = "\\.css$", recursive = TRUE, full.names = TRUE)
+  if (length(FILE) > 0) {
+     # Convert each file into a path that includes build_dir
+     CSS <- file.path(build_dir, basename(FILE))
+
+
+     if ("html" %in% output_format) {
+       FIELD <- list(format = list(html = list(css = CSS)))
+       DATA <- .merge(DATA, FIELD)
+     }
+     if ("revealjs" %in% output_format) {
+       FIELD <- list(format = list(revealjs = list(css = CSS)))
+       DATA <- .merge(DATA, FIELD)
+     }
+   }
+    
     
     # ---------------------------------------------------------------------------
     # LANGUAGE-DEPENDENT STAGE

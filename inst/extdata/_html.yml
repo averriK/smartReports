@@ -1,0 +1,52 @@
+#============================================================================
+# 1. HTML (Website / Document) Options
+#============================================================================
+format:
+ html:   
+    #---------------------------------------------------------------------------
+    # Basic output settings
+    #---------------------------------------------------------------------------
+    self-contained: false            # Bundle resources (CSS, images) into the HTML   
+    # include-in-header: "header.html"
+    # include-before-body: "before.html"
+    # include-after-body: "after.html
+    #---------------------------------------------------------------------------
+    # Citations & references
+    #---------------------------------------------------------------------------
+    link-citations: true
+    citation-style: "apalike"
+    # bibliography: "references.bib"
+    #---------------------------------------------------------------------------
+    # Code blocks
+    #---------------------------------------------------------------------------
+    code-fold: true                  # "Show/Hide code" folding
+    code-summary: "Show code"        # Button text (optional)
+    code-line-numbers: false         # Show line numbers in code blocks
+    code-copy: true                  # Show a "Copy" button on code blocks
+    code-overflow: scroll            # "scroll" or "wrap"
+
+    #---------------------------------------------------------------------------
+    # Figures, tables, captions
+    #---------------------------------------------------------------------------
+    fig-width: 7
+    fig-height: 5
+    # table-caption-side: top        # Not specifically documented for HTML (more for PDF/LaTeX)
+
+    #---------------------------------------------------------------------------
+    # Math & rendering
+    #---------------------------------------------------------------------------
+    math: true                       # Enable math rendering (MathJax or KaTeX)
+    math-output: mathjax             # "mathjax", "katex", or "webtex"   
+
+    page-layout: "article"  # or 'article', or 'custom' if you have a custom layout defined    
+    margin-header: 1em
+    margin-footer: 1em
+    margin-left: 1em
+    margin-right: 1em
+
+    #---------------------------------------------------------------------------
+    # PDF printing
+    #---------------------------------------------------------------------------
+    # pdf: false  # If true, attempts a "print version" PDF via Chrome or wkhtmltopdf
+    # pdf-engine: "chromium"
+ 

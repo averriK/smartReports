@@ -1,0 +1,64 @@
+#============================================================================
+# 3. DOCX (Word Document) Options
+#============================================================================
+format:
+  docx:
+    #---------------------------------------------------------------------------
+    # Page layout
+    #---------------------------------------------------------------------------
+    papersize: A4               # e.g. "letter", "A4", "legal"
+    page-margin-top: 1in
+    page-margin-bottom: 1in
+    page-margin-left: 1in
+    page-margin-right: 1in
+
+    #---------------------------------------------------------------------------
+    # Document sections
+    #---------------------------------------------------------------------------
+    toc: false
+    toc-depth: 3
+    number-sections: false
+
+    #---------------------------------------------------------------------------
+    # Typography
+    #---------------------------------------------------------------------------
+    mainfont: null
+    fontsize: 11pt
+    line-height: 1.6
+
+    #---------------------------------------------------------------------------
+    # Citations & references
+    #---------------------------------------------------------------------------
+    link-citations: false
+    # bibliography: "refs.bib"
+    # csl: "apalike.csl"
+
+    #---------------------------------------------------------------------------
+    # Figures & tables
+    #---------------------------------------------------------------------------
+    fig-width: 5
+    fig-height: 4
+    # docx does not strictly support "fig-cap-location" or "table-caption-side."
+    # Those are primarily for PDF/LaTeX. They won't hurt, but won't always do anything.
+
+    #---------------------------------------------------------------------------
+    # Advanced Pandoc / Quarto flags
+    #---------------------------------------------------------------------------
+    keep-md: false
+    # keep-source: false             # Not typically recognized by Quarto for docx
+    # embed-resources: false         # This is mostly for HTML
+    # embed-data: false              # Also more relevant to HTML outputs
+    default-image-extension: png
+    apply-page-breaks: true         # Insert page breaks between top-level items (e.g. chapters)
+
+    # geometry: []                   # For PDF, not relevant to docx
+    # top-level-division: section    # "chapter" or "section" if you want each to start on new page
+    # i18n-chapters: false           # Mostly PDF/LaTeX
+    # filters: []
+    # execute:
+    #   warning: true
+    #   echo: true
+    #   cache: false
+    #   ...
+
+

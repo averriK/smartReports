@@ -1,0 +1,90 @@
+#============================================================================
+# 2. Reveal.js (Presentation) Options
+#============================================================================
+format:
+  revealjs:
+    theme: "simple"    
+    vertical-align: "top"
+    logo: "_build/srk_white.png"
+    logo-placement: "bottom-right"
+    logo-link: "https://www.srk.com"
+    logo-width: 320
+    center-title-slide: false # pad to left
+    title-slide: false # OMIT TITLE SLIDE 
+    footer: ""
+    footer-placement: "bottom"  # Position of the footer
+    slide-number: true
+    title-footer: false
+    showNotes: true
+    show-footer: true           # Toggle footer visibility
+    # Timing / auto-sliding
+    auto-slide: 0                    # If non-zero, auto progression in ms
+    auto-slide-stoppable: true
+    center: false
+    overview: true
+   #---------------------------------------------------------------------------
+    # Navigation
+    #---------------------------------------------------------------------------
+    controls: true
+    controls-layout: bottom-right    # "edges" or "bottom-right" are typical
+    controls-tutorial: true
+    controls-back-arrows: faded      # "faded", "hidden", "visible"
+    progress: true
+    keyboard: true
+    touch: true
+    mouse-wheel: false
+    loop: false
+    rtl: false
+    hash: true
+    history: false
+     
+    transition: "slide"                # "none", "fade", "slide", "convex", "concave", "zoom"
+    transition-speed: "default"        # "default", "fast", "slow"
+    background-transition: "fade"      # "none", "fade", "slide", "convex", "concave", "zoom"
+
+    #---------------------------------------------------------------------------
+    # Content features
+    #---------------------------------------------------------------------------
+    preview-links: false
+    fragments: true
+    fragment-in-url: true    
+    auto-stretch: false
+    
+    output-file: "index.html"
+    plugins:
+      - search
+      - chalkboard
+      - zoom
+      - menu
+    chalkboard: true
+    search: true    
+    menu: true
+    zoom: true
+    
+    #---------------------------------------------------------------------------
+    # Footer settings
+    #---------------------------------------------------------------------------
+    
+    
+    #---------------------------------------------------------------------------
+    # Code blocks
+    #---------------------------------------------------------------------------
+    highlight-style: github          # "github", "dracula", "zenburn", "github", "dracula", "zenburn", etc.
+    highlight-lines: false           # Quarto does not have robust highlight-lines for Reveal yet
+    code-fold: false
+    code-line-numbers: true
+    code-copy: true
+    code-overflow: scroll
+
+    #---------------------------------------------------------------------------
+    # PDF export (if you do `quarto render ... --to revealjs --to pdf`)
+    #---------------------------------------------------------------------------
+    pdf-separate-fragments: true
+    pdf-max-pages-per-slide: 1  
+
+    title-slide-attributes:
+      data-background-image: ""
+      data-background-size: cover
+      data-background-opacity: "0.5"
+    
+
