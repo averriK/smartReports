@@ -1,12 +1,5 @@
-#===============================================================================
-# REVEALJS PRESENTATION CONFIG
-#===============================================================================
 format:
   revealjs:
-    #-------------------------------------------------------------------------
-    # Slide Formatting
-    #-------------------------------------------------------------------------
-    # Provide an auto-generated HTML output file name:
     output-file: "index.html"
     
     # Use one of the built-in themes (simple, white, black, etc.),

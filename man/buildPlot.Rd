@@ -5,6 +5,11 @@
 \title{Build a highchart plot}
 \usage{
 buildPlot(
+  library = NULL,
+  plot.type = NULL,
+  line.style = "Solid",
+  point.style = "circle",
+  point.marker = TRUE,
   data.lines = NULL,
   data.points = NULL,
   line.type = "line",
@@ -16,8 +21,6 @@ buildPlot(
   yAxis.legend = "Y",
   group.legend = "ID",
   color.palette = "Dark 3",
-  line.style = "Solid",
-  point.style = "circle",
   line.size = 1,
   point.size = 3,
   xAxis.log = FALSE,
@@ -42,22 +45,31 @@ buildPlot(
   plot.title.fontsize = "24px",
   plot.subtitle.fontsize = "18px",
   print.max.abs = FALSE,
-  point.marker = TRUE,
   point.dataLabels = FALSE,
   plot.filename = NULL,
-  interpolation.method = "linear",
-  ...
+  interpolation.method = "linear"
 )
 }
 \arguments{
+\item{library}{DEPRECATED}
+
+\item{plot.type}{DEPRECATED}
+
+\item{line.style}{DEPRECATED; line styles are taken from data.lines$style.
+However, a default style is used if data.lines$style is missing or invalid.}
+
+\item{point.style}{DEPRECATED; point styles are taken from data.points$style.
+However, a default style is used if data.points$style is missing or invalid.}
+
+\item{point.marker}{DEPRECATED; point markers are now controlled via data.points$style.}
+
 \item{data.lines}{A data.table containing columns "ID", "X", "Y", optional "style", optional "fill".
 If NULL, no lines will be plotted.}
 
 \item{data.points}{A data.table containing columns "ID", "X", "Y", optional "style".
 If NULL, no scatter points will be plotted.}
 
-\item{line.type}{A string indicating whether lines should be "line" or "spline".
-If an invalid value is provided, it reverts to "line".}
+\item{line.type}{DEPRECATED}
 
 \item{plot.title}{A string for the plot title}
 
@@ -74,12 +86,6 @@ If an invalid value is provided, it reverts to "line".}
 \item{group.legend}{A string for the group legend}
 
 \item{color.palette}{A string for the color palette (must exist in grDevices::hcl.pals())}
-
-\item{line.style}{Deprecated; line styles are taken from data.lines$style.
-However, a default style is used if data.lines$style is missing or invalid.}
-
-\item{point.style}{Deprecated; point styles are taken from data.points$style.
-However, a default style is used if data.points$style is missing or invalid.}
 
 \item{line.size}{A numeric for the line width}
 
@@ -129,8 +135,6 @@ However, a default style is used if data.points$style is missing or invalid.}
 
 \item{print.max.abs}{A logical for printing max absolute Y labels as annotations (only for lines)}
 
-\item{point.marker}{Deprecated; point markers are now controlled via data.points$style.}
-
 \item{point.dataLabels}{A logical for whether data labels appear for points}
 
 \item{plot.filename}{A string for the plot filename, if saving}
@@ -138,8 +142,6 @@ However, a default style is used if data.points$style is missing or invalid.}
 \item{interpolation.method}{A string specifying the interpolation method used by approx().
 Defaults to "linear". Other valid values include "constant", "spline", etc.
 For large datasets, you can also consider downsampling or chunking externally.}
-
-\item{...}{Additional arguments (unused)}
 }
 \value{
 A highchart object if either data.lines or data.points is provided.

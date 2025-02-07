@@ -14,6 +14,9 @@
 #'                    If NULL, no scatter points will be plotted.
 #' @param line.type A string indicating whether lines should be "line" or "spline". 
 #'                  If an invalid value is provided, it reverts to "line".
+#' @param line.type DEPRECATED
+#' @param library DEPRECATED
+#' @param plot.type DEPRECATED
 #' @param plot.title A string for the plot title
 #' @param plot.subtitle A string for the plot subtitle
 #' @param plot.height A numeric for the plot height
@@ -22,9 +25,9 @@
 #' @param yAxis.legend A string for the y-axis legend
 #' @param group.legend A string for the group legend
 #' @param color.palette A string for the color palette (must exist in grDevices::hcl.pals())
-#' @param line.style Deprecated; line styles are taken from data.lines$style. 
+#' @param line.style DEPRECATED; line styles are taken from data.lines$style. 
 #'                   However, a default style is used if data.lines$style is missing or invalid.
-#' @param point.style Deprecated; point styles are taken from data.points$style. 
+#' @param point.style DEPRECATED; point styles are taken from data.points$style. 
 #'                    However, a default style is used if data.points$style is missing or invalid.
 #' @param line.size A numeric for the line width
 #' @param point.size A numeric for the point size
@@ -50,13 +53,12 @@
 #' @param plot.title.fontsize A string for the plot title fontsize
 #' @param plot.subtitle.fontsize A string for the plot subtitle fontsize
 #' @param print.max.abs A logical for printing max absolute Y labels as annotations (only for lines)
-#' @param point.marker Deprecated; point markers are now controlled via data.points$style. 
+#' @param point.marker DEPRECATED; point markers are now controlled via data.points$style. 
 #' @param point.dataLabels A logical for whether data labels appear for points
 #' @param plot.filename A string for the plot filename, if saving
 #' @param interpolation.method A string specifying the interpolation method used by approx(). 
 #'                             Defaults to "linear". Other valid values include "constant", "spline", etc. 
 #'                             For large datasets, you can also consider downsampling or chunking externally.
-#' @param ... Additional arguments (unused)
 #'
 #' @return A highchart object if either data.lines or data.points is provided. 
 #'         Returns NULL if both are NULL, with a soft warning.
@@ -67,6 +69,11 @@
 #' @export buildPlot
 #' 
 buildPlot <- function(
+  library = NULL, #DEPRECATED.
+  plot.type = NULL, # DEPRECATED. Replaced by line.type.
+  line.style = "Solid",      # DEPRECATED, only used if data.lines$style is missing
+  point.style = "circle",    # DEPRECATED, only used if data.points$style is missing
+  point.marker = TRUE,      # DEPRECATED, replaced by data.points$style
   data.lines = NULL,
   data.points = NULL,
   line.type = "line",  # Must be "line" or "spline"
@@ -78,8 +85,6 @@ buildPlot <- function(
   yAxis.legend = "Y",
   group.legend = "ID",
   color.palette = "Dark 3",
-  line.style = "Solid",      # DEPRECATED, only used if data.lines$style is missing
-  point.style = "circle",    # DEPRECATED, only used if data.points$style is missing
   line.size = 1,
   point.size = 3,
   xAxis.log = FALSE,
@@ -104,11 +109,10 @@ buildPlot <- function(
   plot.title.fontsize = "24px",
   plot.subtitle.fontsize = "18px",
   print.max.abs = FALSE,
-  point.marker = TRUE,      # DEPRECATED, replaced by data.points$style
+  
   point.dataLabels = FALSE,
   plot.filename = NULL,
-  interpolation.method = "linear",
-  ...
+  interpolation.method = "linear"
 ) {
   # Soft check if both data.lines and data.points are NULL
   if (is.null(data.lines) && is.null(data.points)) {
