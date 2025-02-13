@@ -4,7 +4,11 @@ format:
     #---------------------------------------------------------------------------
     # Basic output settings
     #---------------------------------------------------------------------------
-    self-contained: false            # Bundle resources (CSS, images) into the HTML   
+    self-contained: false            # Bundle resources (CSS, images) into the HTML
+    # Activate a Table of Contents with a controlled depth
+    toc: true
+    toc-depth: 3
+    toc-location: left
     # include-in-header: "header.html"
     # include-before-body: "before.html"
     # include-after-body: "after.html
@@ -12,7 +16,6 @@ format:
     # Citations & references
     #---------------------------------------------------------------------------
     link-citations: true
-    # citation-style: "apalike"
     #---------------------------------------------------------------------------
     # Code blocks
     #---------------------------------------------------------------------------
@@ -23,12 +26,10 @@ format:
     code-overflow: scroll            # "scroll" or "wrap"
 
     #---------------------------------------------------------------------------
-    # Figures, tables, captions
+    # Figures, tables, captions and math
     #---------------------------------------------------------------------------
     fig-width: 7
     fig-height: 5
-    # table-caption-side: top        # Not specifically documented for HTML (more for PDF/LaTeX)
-
     #---------------------------------------------------------------------------
     # Math & rendering
     #---------------------------------------------------------------------------

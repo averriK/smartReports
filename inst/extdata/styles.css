@@ -25,7 +25,6 @@
 
 /* ──────────────────────────────────────────────────────────────────
    1) Top-left alignment for slide content 
-      (already in your CSS snippet).
    ────────────────────────────────────────────────────────────────── */
    .reveal .slide {
     display: flex !important;
@@ -115,8 +114,7 @@
 }
 
 /* ──────────────────────────────────────────────────────────────────
-   3) Pinned logo at the bottom-right corner
-   (with some padding from edges).
+   3) Pinned logo at the bottom-right corner (with some padding from edges).
    ────────────────────────────────────────────────────────────────── */
    .reveal .slide-logo {
     position: fixed !important;
@@ -130,8 +128,7 @@
 
 
 /* ──────────────────────────────────────────────────────────────────
-   2) Centered footer styling 
-   (your existing snippet with bottom spacing).
+   2) Centered footer styling with bottom spacing.
    ────────────────────────────────────────────────────────────────── */
    .reveal footer,
    .reveal .footer {
@@ -146,8 +143,7 @@
      z-index: 9999; /* ensure footer is on top of slide content */
    }
    
-/* 
-   ─────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────
    4) Slide number styling
    ─────────────────────────────────────────────────────────────
 */
@@ -159,3 +155,106 @@
   color: var(--medium-grey);
   }
 
+/* 
+   ─────────────────────────────────────────────────────────────
+ Header styling for HTML reports */
+   ─────────────────────────────────────────────────────────────
+*/
+
+
+.report-header {
+  display: flex;
+  align-items: center;
+  padding: 1em;
+  background-color: var(--white);
+  border-bottom: 2px solid var(--light-grey);
+}
+
+.report-header img.logo {
+  max-height: 60px;
+  margin-right: 1em;
+}
+
+/* Footer styling for HTML reports */
+.report-footer {
+  text-align: center;
+  padding: 1em;
+  background-color: var(--white);
+  border-top: 2px solid var(--light-grey);
+  font-size: 0.8em;
+  color: var(--medium-grey);
+}
+
+/* Table of Contents (TOC) styling */
+.toc {
+  border: 1px solid var(--light-grey);
+  padding: 1em;
+  margin-bottom: 1em;
+  background-color: var(--white);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Appendices styling for HTML reports (SRK Styles)
+   ─────────────────────────────────────────────────────────────
+*/
+
+/* Container for Appendices */
+.appendices {
+  counter-reset: appendix-counter; /* Initialize appendix counter */
+  margin-top: 2em;
+  border-top: 2px solid var(--light-grey);
+  padding-top: 1em;
+}
+
+/* Optional title for the appendices section */
+.appendices .appendices-title {
+  font-family: Arial, sans-serif;
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--orange);
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+/* Appendix Chapter (Level 1) styling */
+.appendices h1 {
+  counter-increment: appendix-counter;
+  counter-reset: appendix-subcounter; /* Reset subcounter for subsections */
+  font-family: Arial, sans-serif;
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: var(--black);
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  position: relative;
+}
+
+.appendices h1::before {
+  content: "Appendix " counter(appendix-counter, upper-alpha) ". ";
+  font-family: Arial, sans-serif;
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: var(--orange);
+}
+
+/* Appendix Subchapter (Level 2) styling */
+.appendices h2 {
+  counter-increment: appendix-subcounter;
+  font-family: Arial, sans-serif;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--dark-grey);
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  position: relative;
+  padding-left: 0.5em; /* Optional indent for clarity */
+}
+
+.appendices h2::before {
+  content: counter(appendix-counter, upper-alpha) "." counter(appendix-subcounter, decimal) " ";
+  font-family: Arial, sans-serif;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--orange);
+  margin-right: 0.5em;
+}
