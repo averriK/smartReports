@@ -1,0 +1,146 @@
+---
+title: "Documento mínimo"
+format:
+  docx:
+    reference-doc: "reference_base.docx"
+---
+
+
+# Heading 1
+
+## Heading 2
+
+### Heading 3
+
+#### Heading 4
+
+# Text
+
+This is normal tex. This is **Bold text**. This is text in *Italics*. This is ***Bold Italics***. This text is [Underline]{.underline}. This text has a ~~strikeout~~. This text has a  ~subscript~. This text has a ^superscript^ .
+
+# Code
+
+`x=10 #single lines`
+
+`z=20`
+
+```{python}
+# Bloque de código en Python
+x = 42
+print(x)
+```
+
+| `# Var with line block`
+| `y=24`
+
+> This is a block quote. second line Another one
+
+| Text with line block
+| Text with line block
+
+# Lists
+
+### Bulleted List
+
+-   Bulleted List
+
+    -   sub item list
+
+    -   sub item list
+
+-   Bulleted List
+
+### Tight lists
+
+-   Bulleted Tight List
+-   Bulleted Tight List
+    -   sub item Tight list
+    -   sub item Tight list
+
+### Numbered Listss
+
+1.  Numbered List
+
+2.  Numbered List
+
+### Numbered Tight List
+
+<!-- -->
+
+1.  Numbered Tight List
+2.  Numbered Tight List
+
+### Numbered Tight List with checkbox
+
+-   [ ] Bulleted List Item Checkbox
+
+-   [ ] Bulleted List Item Checkbox
+
+### Tables
+
+| Col1 | Col2      |
+|-----:|:----------|
+|  123 | Texto     |
+|   45 | Más texto |
+
+### Advanced Tables
+
+|    ID | Descripción                      | Precio |
+|------:|:---------------------------------|-------:|
+|   001 | Lorem ipsum dolor sit amet       |   9.99 |
+|   002 | Consectetur adipiscing elit      |  15.50 |
+| 10003 | Sed do eiusmod tempor incididunt | 123.45 |
+
+### Flextables
+
+```{r arb1, include=TRUE}
+#| label: tbl-T1
+#| tbl-cap: "GMPE weights for Active Shallow Crust (ASC) and Stable Continental (SC) zones. Source: GEM"
+
+# ASC table
+DT <- data.table(
+  Source = "ASC",
+  GMPE = c("Atkinson & Boore (AB06)",  # Atkinson & Boore (2006)
+           "Boore et al. (B14)",   # Boore et al. (2014)
+           "Campbell & Bozorgnia (CB14)",  # Campbell & Bozorgnia (2014)
+           "Akkar et al. (A14)",   # Akkar et al. (2014)
+           "Zhao et al. (Z06)"),  # Zhao et al. (2006)
+  Weight = c(0.60, 0.10, 0.10, 0.10, 0.10)
+)
+TBL <- flextable(DT)
+TBL <- flextable::set_table_properties(TBL,layout = "autofit")
+TBL
+```
+
+
+
+
+### Footnotes
+
+This is text with a footnote call[^reference_base-1]
+
+[^reference_base-1]: This is the footnote
+
+### Definitions
+
+term 1
+
+:   definition 1
+
+term 2
+
+:   definition 2
+
+### Paragraphs
+
+### Comments
+
+<!--#  -->
+
+### Tabsets
+
+::: {panel-tabset}
+#### Tab A
+
+#### Tab B
+:::
