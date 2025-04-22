@@ -2,33 +2,66 @@
 % Please edit documentation in R/buildPlot.Histogram.R
 \name{buildPlot.Histogram}
 \alias{buildPlot.Histogram}
-\title{Build a histogram plot}
+\title{Build a histogram (and/or density) plot}
 \usage{
 buildPlot.Histogram(
   .data,
-  xTitle = "",
-  title = "",
-  histogram.breaks = 100,
-  logscale = FALSE,
-  offset = 0.1
+  plot.type = c("histogram"),
+  histogram.breaks = NULL,
+  xAxis.log = FALSE,
+  xAxis.offset = 0.1,
+  xAxis.legend = "X axis",
+  yAxis.legend = "Count",
+  plot.title = NULL,
+  plot.subtitle = NULL,
+  plot.markers = FALSE,
+  color.palette = "Dark3",
+  legend.layout = "horizontal",
+  legend.align = "right",
+  legend.valign = "top",
+  legend.show = TRUE,
+  plot.height = NULL,
+  plot.width = NULL
 )
 }
 \arguments{
-\item{.data}{A data.table with at least two columns: X (numeric) and ID (factor).}
+\item{.data}{A data.table with columns "X" (numeric) and "ID" (factor or character).}
 
-\item{xTitle}{The title for the x-axis.}
+\item{plot.type}{Character vector: \code{"histogram"}, \code{"density"}, or \code{c("histogram","density")}.}
 
-\item{title}{The main title for the plot.}
+\item{histogram.breaks}{Either NULL (automatic Freedman–Diaconis) or numeric (number of bins).}
 
-\item{histogram.breaks}{The number of breaks for the histogram.}
+\item{xAxis.log}{Logical; if TRUE, use log-scale for the X data. Default FALSE.}
 
-\item{logscale}{Logical, whether to use a logarithmic scale for the x-axis.}
+\item{xAxis.offset}{Numeric; fraction to expand the x-axis range on each side. Default 0.1.}
 
-\item{offset}{The percentage of the range to extend the x-axis.}
+\item{xAxis.legend}{Character; label to show on the x-axis. Default "X axis".}
+
+\item{yAxis.legend}{Character; label to show on the y-axis. Default "Count".}
+
+\item{plot.title}{Character; main title. Default NULL.}
+
+\item{plot.subtitle}{Character; optional subtitle. Default NULL.}
+
+\item{plot.markers}{Logical; if TRUE, add quantile markers. Default FALSE.}
+
+\item{color.palette}{Either a character vector of colors or a single string (see details).}
+
+\item{legend.layout}{One of \code{c("horizontal","vertical")}. Default "horizontal".}
+
+\item{legend.align}{One of \code{c("left","center","right")}. Default "right".}
+
+\item{legend.valign}{One of \code{c("top","middle","bottom")}. Default "top".}
+
+\item{legend.show}{Logical; if FALSE, hides the legend. Default TRUE.}
+
+\item{plot.height}{Numeric, chart height in pixels (if NULL, defaults). Default NULL.}
+
+\item{plot.width}{Numeric, chart width in pixels (if NULL, defaults). Default NULL.}
 }
 \value{
-A highchart object representing the histogram plot.
+A highchart object.
 }
 \description{
-This function creates a histogram plot with density curves and statistical markers.
+Creates a histogram, density plot, or both, with optional log-scale and quantile markers.
 }
