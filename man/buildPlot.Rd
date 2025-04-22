@@ -69,7 +69,8 @@ If NULL, no lines will be plotted.}
 \item{data.points}{A data.table containing columns "ID", "X", "Y", optional "style".
 If NULL, no scatter points will be plotted.}
 
-\item{line.type}{DEPRECATED}
+\item{line.type}{A string indicating whether lines should be "line" or "spline".
+If an invalid value is provided, it reverts to "line".}
 
 \item{plot.title}{A string for the plot title}
 
