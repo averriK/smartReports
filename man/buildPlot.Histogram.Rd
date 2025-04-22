@@ -27,17 +27,17 @@ buildPlot.Histogram(
 \arguments{
 \item{.data}{A data.table with columns "X" (numeric) and "ID" (factor or character).}
 
-\item{plot.type}{Character vector: \code{"histogram"}, \code{"density"}, or \code{c("histogram","density")}.}
+\item{plot.type}{Character vector: \code{"histogram"}, \code{"density"}, or both, e.g. \code{c("histogram","density")}.}
 
 \item{histogram.breaks}{Either NULL (automatic Freedman–Diaconis) or numeric (number of bins).}
 
-\item{xAxis.log}{Logical; if TRUE, use log-scale for the X data. Default FALSE.}
+\item{xAxis.log}{Logical; if TRUE, use log-scale on the X data. Default FALSE.}
 
 \item{xAxis.offset}{Numeric; fraction to expand the x-axis range on each side. Default 0.1.}
 
-\item{xAxis.legend}{Character; label to show on the x-axis. Default "X axis".}
+\item{xAxis.legend}{Character label for the x-axis (display only). Default "X axis".}
 
-\item{yAxis.legend}{Character; label to show on the y-axis. Default "Count".}
+\item{yAxis.legend}{Character label for the y-axis. Default "Count".}
 
 \item{plot.title}{Character; main title. Default NULL.}
 
@@ -45,7 +45,7 @@ buildPlot.Histogram(
 
 \item{plot.markers}{Logical; if TRUE, add quantile markers. Default FALSE.}
 
-\item{color.palette}{Either a character vector of colors or a single string (see details).}
+\item{color.palette}{Either a character vector of colors or a single string fallback. Default "Dark3".}
 
 \item{legend.layout}{One of \code{c("horizontal","vertical")}. Default "horizontal".}
 
@@ -63,5 +63,7 @@ buildPlot.Histogram(
 A highchart object.
 }
 \description{
-Creates a histogram, density plot, or both, with optional log-scale and quantile markers.
+Creates a histogram and/or density plot, with optional log-scale, quantile markers,
+and Freedman–Diaconis bin calculation. This version ensures density scaling is computed
+even if only density is plotted (so the density curve appears).
 }
