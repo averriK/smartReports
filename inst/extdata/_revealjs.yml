@@ -9,11 +9,12 @@ format:
     # Eliminate default margins around slides and align from top-left
     margin: 0
     center: false
-    
+  
     # Force a 16:9 aspect ratio by specifying width & height under revealOptions
     revealOptions:
-      width: 1280          # Typical 16:9 width
-      height: 1080 #720          # Typical 16:9 height
+      width: 1920 #1920          # Typical 16:9 width
+      height: 720 #720          # Typical 16:9 height
+      autoScale: false
     
     # Enable scrolling for tall slides
     scrollable: true
@@ -59,7 +60,7 @@ format:
     # Code Blocks
     #-------------------------------------------------------------------------
     # "github", "dracula", "zenburn", etc. 
-    highlight-style: "github"
+    highlight-style: "dracula"
     code-line-numbers: true
     code-copy: true
     code-overflow: "scroll"
@@ -90,19 +91,14 @@ format:
     menu: true
     zoom: true
 
-    #-------------------------------------------------------------------------
-    # PDF Export
-    #-------------------------------------------------------------------------
-    # If you render to PDF, each fragment becomes a new page with pdf-separate-fragments: true
-    pdf-separate-fragments: true
-    pdf-max-pages-per-slide: 1
-
+    
     #-------------------------------------------------------------------------
     # Title Slide Attributes
     #-------------------------------------------------------------------------
+    title-slide: false
     # Optionally style the default title slide background or image
-    title-slide-attributes:
-      data-background-image: ""
-      data-background-size: cover
-      data-background-opacity: "0.5"
+    # title-slide-attributes:
+    #   data-background-image: ""
+    #   data-background-size: cover
+    #   data-background-opacity: "0.5"
 

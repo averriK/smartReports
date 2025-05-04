@@ -11,34 +11,35 @@
 }
 
 /**************************************************************
- B) Base Reveal.js Styling (for slides)
+ B) Base Reveal.js Styling (for slides) + Default Font Size
  **************************************************************/
 .reveal .slides {
   font-family: Arial, sans-serif;
-  font-size: 20px; /* PPT default font size */
+  font-size: 22px !important; /* Texto normal en 24px */
   color: var(--black);
   background-color: var(--white);
 }
 
 /**************************************************************
  C) H1: "Big Part Title" 
-    - Bold, horizontally centered text
+    - 40px, bold, horizontal center
  **************************************************************/
 .reveal h1 {
   font-family: Arial, sans-serif !important;
+  font-size: 44px !important;
   font-weight: bold !important;
-  text-align: center !important; 
+  text-align: center !important;
   margin: 0 auto !important;
 }
 
 /**************************************************************
  D) Auto-center any slide that contains ONLY an H1 
-    (:has() may not work in older browsers)
+    (:has() puede no funcionar en navegadores antiguos)
  **************************************************************/
 .reveal .slides > section:has(> h1:only-child),
 .reveal .slides > section > section:has(> h1:only-child) {
-  justify-content: center !important; /* vertically center */
-  align-items: center !important;     /* horizontally center */
+  justify-content: center !important; /* vertical */
+  align-items: center !important;     /* horizontal */
 }
 
 /**************************************************************
@@ -53,8 +54,7 @@
 
 /**************************************************************
  F) Default Slide Layout (Top-Left Alignment)
-    - You later override with "auto-center" only if slide has 
-      a single H1 child (see section D)
+    - Overridden by "auto-center" only if there's a single H1
  **************************************************************/
 .reveal .slide {
   display: flex !important;
@@ -70,8 +70,8 @@
 }
 
 /**************************************************************
- G) H2: Orange Border, "Pinned at Top," 
-    No Top Margin, Some Space Below
+ G) H2: Orange Border, 
+    - 32px, bold, pinned at top
  **************************************************************/
 .reveal h2 {
   margin-top: 0 !important;
@@ -80,76 +80,94 @@
   padding-left: 12px;
   position: relative !important;
   top: 0 !important;
+
   font-family: Arial, sans-serif;
-  font-weight: bold;
-  font-size: 32px;
+  font-size: 32px !important;
+  font-weight: bold !important;
   color: var(--black);
 }
 
 /**************************************************************
- H) H3, H4, H5: No Orange Border, Bold, Etc.
+ H) H3, H4 
+    - No Orange Border
  **************************************************************/
-.reveal h3,
-.reveal h4,
-.reveal h5 {
+
+/* H3: 28px, normal margins, normal/bold? -> decides. 
+   Suponiendo bold para "todos los headings", lo ponemos en bold. */
+.reveal h3 {
   margin-top: 15px;
   margin-bottom: 0.6em;
   border-left: none !important;
   padding-left: 12px;
   font-family: Arial, sans-serif;
-  font-weight: normal;
+  font-size: 28px !important;
+  font-weight: bold !important;
   color: var(--black);
 }
 
+/* H4: 24px, igual que texto normal pero en bold */
+.reveal h4 {
+  margin-top: 15px;
+  margin-bottom: 0.6em;
+  border-left: none !important;
+  padding-left: 12px;
+  font-family: Arial, sans-serif;
+  font-size: 24px !important;
+  font-weight: bold !important;
+  color: var(--black);
+}
+
+/* H5 - Eliminado o lo dejas comentado
+.reveal h5 {
+  ...
+}*/
+
 /**************************************************************
- I) Cover Slide (#coverSlide) Overrides
-    - Vertically center all content, left-aligned,
-      normal font-weight for general text
+ I) Cover Slide (.coverSlide) Overrides
+    - Usa div.cover-title, .cover-subtitle, .cover-authors
  **************************************************************/
-.reveal #coverSlide {
+.reveal .coverSlide {
   display: flex !important;
   flex-direction: column !important;
-  justify-content: center !important; /* vertical centering */
-  align-items: flex-start !important; /* left alignment */
+  justify-content: center !important; /* vertical center */
+  align-items: center !important;     /* horizontal center */
   height: 100% !important;
   margin: 0;
   padding: 0 !important; 
-  text-align: left;
-  font-weight: normal; 
-}
-
-/* 1) Cover Slide H2: Larger if desired */
-.reveal #coverSlide h2 {
-  font-size: 40px !important; 
-  margin-bottom: 0 !important; 
-  line-height: 1.2 !important;
-  /* If you do NOT want the orange border or bold, uncomment:
-     border-left: none !important;
-     font-weight: normal !important; 
-  */
-}
-
-/* 2) Cover Slide H3: No orange border, orange text, normal weight */
-.reveal #coverSlide h3 {
-  font-size: 28px;
-  color: var(--orange) !important; 
-  margin-top: 0.2em;
-  margin-bottom: 0.6em;
-  font-weight: normal !important;
-}
-
-/* 3) Cover Slide H4: Author line, normal weight, grey text */
-.reveal #coverSlide h4 {
-  font-size: 20px;
-  color: var(--medium-grey);
-  margin-top: 40px;
-  margin-bottom: 0.2em;
+  text-align: center;
   font-weight: normal;
 }
 
+/* 1) Cover Title: 48px, centrado, etc. */
+.reveal .coverSlide .cover-title {
+  font-size: 52px !important;
+  font-weight: bold !important;
+  color: var(--black);
+  margin-bottom: 0.3em;
+  margin-top: 0;
+}
+
+/* 2) Cover Subtitle: 32px, normal weight */
+.reveal .coverSlide .cover-subtitle {
+  font-size: 36px !important;
+  font-weight: normal !important;
+  color: var(--black);
+  margin-top: 0.2em;
+  margin-bottom: 0.6em;
+}
+
+/* 3) Cover Authors: 20px, grey */
+.reveal .coverSlide .cover-authors {
+  font-size: 20px !important;
+  color: var(--medium-grey) !important;
+  margin-top: 40px !important;
+  margin-bottom: 0.2em !important;
+  font-weight: normal !important;
+}
+
 /* 4) Hide slide number & footer on cover slide only */
-.reveal section#coverSlide .slide-number,
-.reveal section#coverSlide footer {
+.reveal .coverSlide .slide-number,
+.reveal .coverSlide footer {
   display: none;
 }
 
@@ -160,7 +178,7 @@
   position: fixed !important;
   bottom: 20px !important;
   right: 20px !important;
-  max-height: 60px !important; 
+  max-height: 190px !important; 
   width: auto !important;      
   z-index: 9999 !important;
   margin: 0 !important;
@@ -191,4 +209,21 @@
   bottom: 20px !important;
   font-size: 14px;
   color: var(--medium-grey);
+}
+
+
+/**************************************************************
+M) Code Blocks in Slides
+**************************************************************/
+.reveal pre code,
+.reveal pre code.hljs,
+.reveal pre.sourceCode code,
+.reveal code.hljs,
+.sourceCode code {
+  font-size: 16px !important;
+  line-height: 1.2 !important;
+  /* For debugging, uncomment:
+  color: red !important; 
+  background: #ffff0077 !important;
+  */
 }
