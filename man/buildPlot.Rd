@@ -7,9 +7,6 @@
 buildPlot(
   library = NULL,
   plot.type = NULL,
-  line.style = "Solid",
-  point.style = "circle",
-  point.marker = TRUE,
   data.lines = NULL,
   data.points = NULL,
   line.type = "line",
@@ -21,6 +18,8 @@ buildPlot(
   yAxis.legend = "Y",
   group.legend = "ID",
   color.palette = "Dark 3",
+  line.style = "solid",
+  point.style = "circle",
   line.size = 1,
   point.size = 3,
   xAxis.log = FALSE,
@@ -51,17 +50,9 @@ buildPlot(
 )
 }
 \arguments{
-\item{library}{DEPRECATED}
+\item{library}{DEPRECATED. A placeholder parameter that triggers a warning if used.}
 
-\item{plot.type}{DEPRECATED}
-
-\item{line.style}{DEPRECATED; line styles are taken from data.lines$style.
-However, a default style is used if data.lines$style is missing or invalid.}
-
-\item{point.style}{DEPRECATED; point styles are taken from data.points$style.
-However, a default style is used if data.points$style is missing or invalid.}
-
-\item{point.marker}{DEPRECATED; point markers are now controlled via data.points$style.}
+\item{plot.type}{DEPRECATED. A placeholder parameter that triggers a warning if used.}
 
 \item{data.lines}{A data.table containing columns "ID", "X", "Y", optional "style", optional "fill".
 If NULL, no lines will be plotted.}
@@ -69,8 +60,8 @@ If NULL, no lines will be plotted.}
 \item{data.points}{A data.table containing columns "ID", "X", "Y", optional "style".
 If NULL, no scatter points will be plotted.}
 
-\item{line.type}{A string indicating whether lines should be "line" or "spline".
-If an invalid value is provided, it reverts to "line".}
+\item{line.type}{A string indicating the line series type. Options might include \code{"line"} or \code{"spline"}.
+If invalid, \code{"line"} is used.}
 
 \item{plot.title}{A string for the plot title}
 
@@ -84,9 +75,15 @@ If an invalid value is provided, it reverts to "line".}
 
 \item{yAxis.legend}{A string for the y-axis legend}
 
-\item{group.legend}{A string for the group legend}
+\item{group.legend}{A string for the legend title}
 
-\item{color.palette}{A string for the color palette (must exist in grDevices::hcl.pals())}
+\item{color.palette}{A string for the color palette (must exist in \code{grDevices::hcl.pals()})}
+
+\item{line.style}{A string specifying the default line style if \code{data.lines$style} is missing/invalid.
+Valid examples include \code{"solid"}, \code{"dashed"}, \code{"dotted"}, etc.}
+
+\item{point.style}{A string specifying the default point marker style if \code{data.points$style} is missing/invalid.
+Valid examples: \code{"circle"}, \code{"square"}, \code{"diamond"}, etc.}
 
 \item{line.size}{A numeric for the line width}
 
@@ -114,11 +111,11 @@ If an invalid value is provided, it reverts to "line".}
 
 \item{legend.layout}{A string for the legend layout}
 
-\item{legend.align}{A string for the legend align}
+\item{legend.align}{A string for the legend horizontal alignment (e.g. \code{"center"}, \code{"left"}, \code{"right"})}
 
-\item{legend.valign}{A string for the legend valign}
+\item{legend.valign}{A string for the legend vertical alignment (e.g. \code{"top"}, \code{"middle"}, \code{"bottom"})}
 
-\item{legend.show}{A logical for the legend show}
+\item{legend.show}{A logical for the legend show/hide}
 
 \item{plot.save}{A logical for the plot save}
 
@@ -128,7 +125,7 @@ If an invalid value is provided, it reverts to "line".}
 
 \item{yAxis.legend.fontsize}{A string for the y-axis legend fontsize}
 
-\item{group.legend.fontsize}{A string for the group legend fontsize}
+\item{group.legend.fontsize}{A string for the legend items' fontsize}
 
 \item{plot.title.fontsize}{A string for the plot title fontsize}
 
@@ -140,20 +137,19 @@ If an invalid value is provided, it reverts to "line".}
 
 \item{plot.filename}{A string for the plot filename, if saving}
 
-\item{interpolation.method}{A string specifying the interpolation method used by approx().
-Defaults to "linear". Other valid values include "constant", "spline", etc.
-For large datasets, you can also consider downsampling or chunking externally.}
+\item{interpolation.method}{A string specifying the interpolation method used by \code{approx()}.
+Defaults to \code{"linear"}. Other valid values might include \code{"constant"}, \code{"spline"}.}
 }
 \value{
-A highchart object if either data.lines or data.points is provided.
+A highchart object if either \code{data.lines} or \code{data.points} is provided.
 Returns NULL if both are NULL, with a soft warning.
 }
 \description{
 Build a highchart plot using separate data sources for lines and points.
 
 Supports the plotting of line and scatter series. Includes optional arearange shading between
-two line groups if indicated in data.lines$fill and interpolation is handled via the approx function
-(which can be customized using the interpolation.method argument). Fallback behaviors:
-if an invalid line.type is provided, "line" is used; if an invalid or missing line style is found,
-"solid" is used; if an invalid color.palette is provided, a default Highcharts palette is chosen.
+two line groups if indicated in \code{data.lines$fill}, and interpolation is handled via the \code{approx} function
+(which can be customized using the \code{interpolation.method} argument). Fallback behaviors:
+if an invalid \code{line.type} is provided, \code{"line"} is used; if an invalid or missing line style is found,
+\code{"solid"} is used; if an invalid \code{color.palette} is provided, a default Highcharts palette is chosen.
 }
