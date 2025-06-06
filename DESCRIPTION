@@ -1,5 +1,5 @@
 Package: smartReports
-Version: 0.3.2
+Version: 0.3.3
 Title: Comprehensive Report Generation with Enhanced Plots, Tables, and AI-Powered Text
 Description: The smartReports package provides comprehensive tools for generating professional and customizable reports in R. It offers advanced functions to create high-quality plots and well-formatted tables effortlessly. It streamlines the process of data visualization and presentation, allowing users to build detailed reports that combine insightful graphics and tables seamlessly. Additionally, it integrates AI capabilities to translate and enhance report text using OpenAI, Anthropic and Google APIs, enabling automatic improvement and localization of your reports.
 License: GPL (>= 3)

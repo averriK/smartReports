@@ -1,7 +1,5 @@
 file.remove("NAMESPACE") |> suppressWarnings()
+# usethis::use_proprietary_license(copyright_holder = "Alejandro Verri Kozlowski")
 usethis::use_gpl_license(version = 3, include_future = TRUE)
-devtools::document()
-devtools::check()
-remove.packages("smartReports") |> suppressWarnings()
-devtools::install()
-
+devtools::check(document = TRUE, cran = TRUE, force_suggests = TRUE, vignettes = TRUE)
+devtools::install(build_vignettes = TRUE, dependencies = TRUE, build = TRUE, upgrade = TRUE, force = TRUE)
