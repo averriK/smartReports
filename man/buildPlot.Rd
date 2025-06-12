@@ -79,11 +79,9 @@ If invalid, \code{"line"} is used.}
 
 \item{color.palette}{A string for the color palette (must exist in \code{grDevices::hcl.pals()})}
 
-\item{line.style}{A string specifying the default line style if \code{data.lines$style} is missing/invalid.
-Valid examples include \code{"solid"}, \code{"dashed"}, \code{"dotted"}, etc.}
+\item{line.style}{A string specifying the default line style if \code{data.lines$style} is missing/invalid.}
 
-\item{point.style}{A string specifying the default point marker style if \code{data.points$style} is missing/invalid.
-Valid examples: \code{"circle"}, \code{"square"}, \code{"diamond"}, etc.}
+\item{point.style}{A string specifying the default point marker style if \code{data.points$style} is missing/invalid.}
 
 \item{line.size}{A numeric for the line width}
 
@@ -137,8 +135,7 @@ Valid examples: \code{"circle"}, \code{"square"}, \code{"diamond"}, etc.}
 
 \item{plot.filename}{A string for the plot filename, if saving}
 
-\item{interpolation.method}{A string specifying the interpolation method used by \code{approx()}.
-Defaults to \code{"linear"}. Other valid values might include \code{"constant"}, \code{"spline"}.}
+\item{interpolation.method}{A string specifying the interpolation method used by \code{approx()}.}
 }
 \value{
 A highchart object if either \code{data.lines} or \code{data.points} is provided.

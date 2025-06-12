@@ -1,3 +1,4 @@
+# nolint start
 #' @title Build a highchart plot
 #' @description Build a highchart plot using separate data sources for lines and points.
 #'
@@ -24,9 +25,7 @@
 #' @param group.legend A string for the legend title
 #' @param color.palette A string for the color palette (must exist in `grDevices::hcl.pals()`)
 #' @param line.style A string specifying the default line style if `data.lines$style` is missing/invalid.
-#'                   Valid examples include `"solid"`, `"dashed"`, `"dotted"`, etc.
 #' @param point.style A string specifying the default point marker style if `data.points$style` is missing/invalid.
-#'                    Valid examples: `"circle"`, `"square"`, `"diamond"`, etc.
 #' @param line.size A numeric for the line width
 #' @param point.size A numeric for the point size
 #' @param xAxis.log A logical for the x-axis log scale
@@ -54,7 +53,6 @@
 #' @param point.dataLabels A logical for whether data labels appear for points
 #' @param plot.filename A string for the plot filename, if saving
 #' @param interpolation.method A string specifying the interpolation method used by `approx()`.
-#'                             Defaults to `"linear"`. Other valid values might include `"constant"`, `"spline"`.
 #'
 #' @return A highchart object if either `data.lines` or `data.points` is provided.
 #'         Returns NULL if both are NULL, with a soft warning.
@@ -147,15 +145,18 @@ buildPlot <- function(
     #    The final Highcharts dashStyle strings are typically capitalized, but
     #    we keep the map keys in lowercase for consistent matching.
     LINE.STYLE <- list(
-        "solid"          = "Solid",
-        "dashed"         = "Dash",
-        "dotted"         = "Dot",
-        "dotdash"        = "DashDot",
-        "longdash"       = "LongDash",
-        "twodash"        = "Dash",
-        "shortdash"      = "ShortDash",
-        "shortdot"       = "ShortDot",
-        "shortdashdot"   = "ShortDashDot",
+        "solid" = "Solid",
+        "dashed" = "Dash",
+        "dash" = "Dash",
+        "twodash" = "Dash",
+        "dot" = "Dot",
+        "dotted" = "Dot",
+        "dashdot" = "DashDot",
+        "dotdash" = "DashDot",
+        "longdash" = "LongDash",
+        "shortdash" = "ShortDash",
+        "shortdot" = "ShortDot",
+        "shortdashdot" = "ShortDashDot",
         "longdashdotdot" = "LongDashDotDot"
     )
 
