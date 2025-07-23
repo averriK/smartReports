@@ -296,6 +296,7 @@ buildPlot <- function(
             } else {
                 style_val <- tolower(line.style) # fallback
             }
+            ## --- dash style (unchanged) -------------------------------------
 
             dash_style <- LINE.STYLE[[style_val]]
             if (is.null(dash_style)) {
@@ -306,11 +307,27 @@ buildPlot <- function(
                 dash_style <- LINE.STYLE[["solid"]] # final fallback
             }
 
-            # Build line series
+
+
+            ## --- geometry ("line" vs "spline") ------------------------------
+            if ("type" %in% names(sub_data)) {
+                type_val <- tolower(as.character(sub_data$type[1]))
+            } else {
+                type_val <- line.type # global fallback
+            }
+            if (!type_val %in% c("line", "spline")) {
+                warning(sprintf(
+                    "Invalid line type '%s' for ID='%s'. Using 'line'.",
+                    type_val, gid
+                ))
+                type_val <- "line"
+            }
+
+            ## --- add series -------------------------------------------------
             plot.object <- plot.object |>
                 hc_add_series(
                     data = sub_data,
-                    type = line.type,
+                    type = type_val, # <- per-series geometry
                     hcaes(x = X, y = Y),
                     name = as.character(gid),
                     color = ID.COLOR.MAP[as.character(gid)],
