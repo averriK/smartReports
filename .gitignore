@@ -44,3 +44,5 @@ index.rmarkdown
 
 html/
 .Rproj.user
+
+.idea/
