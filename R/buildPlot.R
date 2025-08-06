@@ -238,7 +238,16 @@ buildPlot <- function(
             reversed = yAxis.reverse,
             max = if (!is.na(yAxis.max)) yAxis.max else NULL,
             min = if (!is.na(yAxis.min)) yAxis.min else NULL
+        ) |>
+      hc_exporting(
+        enabled = TRUE,
+        filename = if (!is.null(plot.filename)) plot.filename else "highchart-plot",
+        buttons = list(
+            contextButton = list(
+                menuItems = c("downloadPNG", "downloadJPEG", "downloadPDF", "downloadSVG")
+            )
         )
+    )
 
     ## 12. Theme handling
     if (!is.null(plot.theme)) {
