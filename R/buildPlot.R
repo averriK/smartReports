@@ -244,7 +244,7 @@ buildPlot <- function(
         filename = if (!is.null(plot.filename)) plot.filename else "highchart-plot",
         buttons = list(
             contextButton = list(
-                menuItems = c("downloadPNG", "downloadJPEG", "downloadPDF", "downloadSVG")
+                menuItems = c("downloadPNG", "downloadJPEG", "downloadPDF", "downloadSVG", "downloadCSV", "downloadXLS")
             )
         )
     )
