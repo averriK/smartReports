@@ -852,3 +852,265 @@ If you find discrepancies between documentation and actual behavior, please file
 - What the documentation says
 - What actually happens
 - Minimal reproducible example
+
+---
+
+## Typewriter Effects for Presentations
+
+### Overview
+
+smartReports includes vintage terminal typewriter effects for Quarto revealjs presentations. Three main functions:
+
+1. **`showTypewriter()`** - Single typewriter animation from text or file
+2. **`rotateTypewriter()`** - Rotating animations through multiple files  
+3. **`buildIndexTypewriter()`** - Auto-generate chapter indexes with typewriter effect
+
+### Available Vintage Fonts
+
+**13 authentic vintage computer/terminal fonts:**
+
+| Font | Description | Era | Color Recommendation |
+|------|-------------|-----|---------------------|
+| `vt323` | DEC VT320 terminal | 1987 | `#00ff00` (green phosphor) |
+| `ibm` | IBM Plex Mono | 1970s-80s | `#ffb000` (amber) |
+| `courier` | Typewriter | 1950s | `#000000` on beige |
+| `space` | Retro-futuristic | 1960s-70s | `#00ffff` (cyan) |
+| `anonymous` | Unix/Linux terminal | 1990s | `#00ff00` |
+| `press` | 8-bit arcade/NES | 1980s | `#ffffff` |
+| `silkscreen` | Pixel art display | 1980s-90s | `#ff00ff` |
+| `atari` | Atari 800/ST | 1970s-80s | `#00ff00` |
+| `c64` | Commodore 64 | 1980s | `#8888ff` on `#4040cc` |
+| `dotgothic` | 16x16 CRT pixel | 1980s | `#00ff00` |
+| `overpass` | OCR-style blocky | ID cards | `#000000` |
+| `nova` | MOTHER/NORAD | 1970s-80s | `#a8b820` or `#ff8800` |
+| `syne` | Military radar | 1970s | `#ff8800` (orange) |
+| `data70` | OCR/ID cards | 1970s | `#ff0000` (local font) |
+
+### Quick Examples
+
+#### 1. Simple Typewriter from Text
+
+```r
+library(smartReports)
+
+showTypewriter(
+  text = ">> SYSTEM READY\n>> LOADING...",
+  font = "vt323",
+  speed = 10,
+  color = "#00ff00",
+  bgColor = "#000"
+)
+```
+
+#### 2. Typewriter from File
+
+```r
+showTypewriter(
+  filePath = "terminal_output.txt",
+  font = "ibm",
+  fontSize = 0.9,
+  color = "#ffb000"
+)
+```
+
+#### 3. Build Chapter Index
+
+```r
+buildIndexTypewriter(
+  index = c("INTRODUCTION", "METHODS", "RESULTS", "CONCLUSIONS"),
+  font = "atari",
+  fontSize = 0.9,
+  color = "#00ff00"
+)
+```
+
+#### 4. Rotating Animations (Movie Terminals)
+
+```r
+# HAL 9000 style (2001: A Space Odyssey)
+rotateTypewriter(
+  filePaths = c(
+    "hal_01.txt",
+    "hal_02.txt",
+    "hal_03.txt"
+  ),
+  speed = 3,
+  rotateDelay = 2000,
+  font = "ibm",
+  fontSize = 0.7,
+  color = "#88CCDD",
+  bgColor = "#0a0a0a"
+)
+
+# NORAD War Room (WarGames 1983)
+rotateTypewriter(
+  filePaths = c("wopr_01.txt", "wopr_02.txt"),
+  font = "nova",
+  color = "#ff8800",  # Orange radar display
+  bgColor = "#000000"
+)
+
+# MOTHER (Alien 1979)
+rotateTypewriter(
+  filePaths = c("mother_01.txt", "mother_02.txt"),
+  font = "nova",
+  color = "#a8b820",  # Green-yellow phosphor
+  bgColor = "#0a0a0a"
+)
+```
+
+### Color Palettes
+
+**Classic CRT Terminal Colors:**
+
+```r
+# Green phosphor (VT terminals)
+color = "#00ff00", bgColor = "#000"
+
+# Amber phosphor (DEC, IBM)
+color = "#ffb000", bgColor = "#000"
+
+# White phosphor
+color = "#f0f0f0", bgColor = "#000"
+
+# Cyan (Tektronix)
+color = "#00ffff", bgColor = "#000"
+
+# Commodore 64 blue
+color = "#8888ff", bgColor = "#4040cc"
+
+# MOTHER (Alien) - green-yellow
+color = "#a8b820", bgColor = "#0a0a0a"
+
+# NORAD radar - orange
+color = "#ff8800", bgColor = "#000"
+```
+
+### Function Parameters
+
+#### showTypewriter()
+
+```r
+showTypewriter(
+  filePath = NULL,        # Path to .txt file
+  text = NULL,            # Direct text (alternative to filePath)
+  speed = 5,              # Milliseconds per character
+  font = "vt323",        # Font name (see table above)
+  fontSize = 0.9,         # Em units
+  color = "#00ff00",     # Text color (hex)
+  bgColor = "#000"       # Background color (hex)
+)
+```
+
+#### rotateTypewriter()
+
+```r
+rotateTypewriter(
+  filePaths,              # Vector of file paths
+  speed = 5,              # Typing speed (ms/char)
+  rotateDelay = 3000,     # Delay before next file (ms)
+  font = "vt323",
+  fontSize = 0.9,
+  color = "#00ff00",
+  bgColor = "#000"
+)
+```
+
+#### buildIndexTypewriter()
+
+```r
+buildIndexTypewriter(
+  index,                  # Character vector of chapter names
+  speed = 5,
+  font = "vt323",
+  fontSize = 0.9,
+  color = "#00ff00",
+  bgColor = "#000"
+)
+```
+
+### Using in Quarto Revealjs
+
+```markdown
+---
+title: "My Presentation"
+format: revealjs
+---
+
+```{r setup}
+library(smartReports)
+```
+
+## Chapter I
+
+```{r}
+#| echo: false
+#| results: asis
+buildIndexTypewriter(
+  index = c("INTRODUCTION", "METHODS", "RESULTS"),
+  font = "atari",
+  color = "#00ff00"
+)
+```
+
+## Terminal Demo
+
+```{r}
+#| echo: false
+#| results: asis
+rotateTypewriter(
+  filePaths = c("demo1.txt", "demo2.txt"),
+  font = "vt323",
+  color = "#00ff00"
+)
+```
+```
+
+### Adding Custom Local Fonts
+
+For fonts not in Google Fonts (like Data70):
+
+1. **Download font file** (`.ttf`, `.woff`, or `.woff2`)
+2. **Place in** `smartReports/inst/fonts/`
+3. **Add configuration** in R helpers (edit `typewriter.R`)
+
+```r
+"data70" = list(
+  family = "'Data70', monospace",
+  link = NULL,  # NULL = local font
+  local = "data70"  # filename without extension
+)
+```
+
+4. **Use in code:**
+
+```r
+showTypewriter(
+  text = "ID: 4532-1523-9876",
+  font = "data70"
+)
+```
+
+See `inst/fonts/README.md` for detailed instructions.
+
+### Font Installation
+
+**Data70 (OCR-style):**
+
+1. Download from: https://www.dafont.com/data70.font
+2. Extract `data70.ttf`
+3. Place in `smartReports/inst/fonts/`
+4. (Optional) Convert to WOFF2:
+   ```bash
+   pip3 install fonttools brotli
+   pyftsubset data70.ttf --output-file=data70.woff2 --flavor=woff2
+   ```
+
+### Notes
+
+- All Google Fonts load automatically
+- Local fonts require manual download
+- Typewriter effects work in revealjs presentations only
+- Effects trigger when slide becomes active
+- Unique IDs prevent multiple animations interfering
+- Speed recommendations: 3-5ms for smooth animation, 10-20ms for dramatic effect
