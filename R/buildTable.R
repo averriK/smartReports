@@ -229,6 +229,12 @@ buildTable <- function(.x,
       )
   }
 
+  # Caption support
+  if (!is.null(caption)) {
+    TABLE <- TABLE |>
+      gt::tab_caption(caption)
+  }
+
   return(TABLE)
 }
 

@@ -158,7 +158,7 @@ table <- buildTable(
 table
 ```
 
-### 3. Generate Complete Report
+### 3. Build YAML and Render with Quarto
 
 ```r
 # Project structure:
@@ -170,16 +170,21 @@ table
 #   ├── _docx.yml           # Word format configuration (optional)
 #   ├── _pdf.yml            # PDF format configuration (optional)
 #   ├── references.bib      # Bibliography (optional)
-#   └── _build/             # Intermediate files (auto-created)
+#   └── _build/             # Support files (auto-created)
 
-# Render report in multiple formats
-buildReport(
+# 1) Build consolidated _quarto.yml and prepare folders
+buildYAML(
   build_dir = "_build",
   publish_dir = "_publish",
   index_filename = "index.qmd",
   language = "EN",
-  output_format = c("html", "docx", "pdf"),
-  render = TRUE
+  output_format = c("html", "docx", "pdf")
+)
+
+# 2) Render using Quarto (from R)
+quarto::quarto_render(
+  input = "index.qmd",
+  output_format = c("html", "docx", "pdf")
 )
 
 # Output: _publish/index.html, _publish/index.docx, _publish/index.pdf
@@ -338,13 +343,19 @@ writeLines(c(
 
 setwd("report")
 
-buildReport(
+# Build _quarto.yml and prepare folders
+buildYAML(
   build_dir = "_build",
   publish_dir = "_publish",
   index_filename = "index.qmd",
   language = "EN",
-  output_format = c("html"),
-  render = TRUE
+  output_format = c("html")
+)
+
+# Render with Quarto
+quarto::quarto_render(
+  input = "index.qmd",
+  output_format = c("html")
 )
 
 # Output files:
@@ -375,6 +386,7 @@ buildReport(
 - `xAxis.reverse`, `yAxis.reverse`: Axis inversion
 - `plot.save`: Export to HTML file
 - `plot.theme`: Highcharts theme object
+- `fill.opacity`: Arearange shading opacity (0-1) when using `data.lines$fill`
 
 ### Tables
 
@@ -399,7 +411,9 @@ buildReport(
 
 | Function | Description | Input | Output |
 |----------|-------------|-------|--------|
-| `buildReport` | Multi-format report rendering | .qmd + config files | HTML/PDF/DOCX files |
+| `buildYAML` | Assemble `_quarto.yml` and prepare folders | .qmd + config files | `_quarto.yml` + prepared dirs |
+
+Render separately with Quarto: `quarto::quarto_render("index.qmd", output_format = c("html","pdf","docx"))`.
 
 **Configuration files:**
 - `_params.yml`: Report parameters (title, date, custom variables)
@@ -613,29 +627,17 @@ project/
 Specify language-specific templates:
 
 ```r
-buildReport(
+buildYAML(
   language = "ES",
   output_format = c("html", "pdf")
 )
+quarto::quarto_render("index.qmd", output_format = c("html", "pdf"))
 ```
 
 Loads:
 - `_params_ES.yml`
 - `_html_ES.yml`
 - `_pdf_ES.yml`
-
-### Post-Render Cleaning
-
-Automatically removes intermediate files:
-
-```r
-buildReport(
-  extensions = c("aux", "log", "tex", "bbl", "blg"),
-  render = TRUE
-)
-```
-
-Preserves only final outputs in `_publish/`.
 
 ---
 
@@ -707,7 +709,7 @@ smartReports/
 │   ├── buildHist2D.R       # Internal: 2D histograms
 │   ├── buildHist3D.R       # Internal: 3D surface plots
 │   ├── buildTable.R        # Table formatting
-│   ├── buildReport.R       # Report generation
+│   ├── buildYAML.R         # Build consolidated _quarto.yml
 │   ├── export.R            # Export utilities
 │   └── local.R             # Internal helpers
 ├── man/                     # Documentation (auto-generated)

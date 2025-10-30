@@ -1,22 +1,25 @@
 # nolint start
-#' Build Quarto Report
+#' Build Quarto YAML and prepare project structure
 #'
-#' This function builds the Quarto report, handling pre-render and post-render tasks.
-#' @param build_dir Name of the yml folder.
-#' @param publish_dir Name of the publish folder.
-#' @param index_filename Name of the index file.
-#' @param quarto_filename Name of the Quarto configuration file.
-#' @param language Language code ('EN', 'ES', etc.).
-#' @param output_format Output formats (e.g., 'html', 'docx').
-#' @param extensions Extensions to be removed.
-#' @param render Logical. Should the Quarto document be rendered?
-#' @importFrom utils tail
+#' Assemble a consolidated Quarto configuration (`_quarto.yml`) by merging project files
+#' (parameters, authors, format-specific YAMLs) with language-specific variants when present.
+#' Copies package support files into `build_dir`, ensures a clean `publish_dir`, and writes
+#' the final `_quarto.yml`. Rendering is not performed; use Quarto CLI or
+#' `quarto::quarto_render()` after calling this function.
+#'
+#' @param build_dir Directory where package support files are copied (created if needed).
+#' @param publish_dir Output directory configured in the generated `_quarto.yml` (re-created).
+#' @param index_filename Report entrypoint (e.g. `index.qmd`). Used to invoke Quarto downstream.
+#' @param quarto_filename Target filename for the generated Quarto config (default `_quarto.yml`).
+#' @param language Language code (e.g. `"EN"`, `"ES"`) to pick suffixed files like `_html_ES.yml`.
+#' @param output_format Character vector of output formats to include (e.g. `c("html","pdf")`).
+#' @param extensions Reserved for future cleanup behavior (currently used only on error paths).
+#' @param render Ignored. Rendering should be done via Quarto after this function returns.
+#'
 #' @import data.table
-#' @import yaml 
-#' 
+#' @import yaml
 #' @export
-#' 
-buildReport <- function(
+buildYAML <- function(
     build_dir = "_build",
     publish_dir = "_publish",
     index_filename = "index.qmd",
@@ -82,7 +85,10 @@ buildReport <- function(
     }
     
     # Parameters
-    FILE <- list.files(".", pattern = "_params\\.yml$", recursive = TRUE, full.names = TRUE)
+    FILE <- list.files(".", pattern = paste0("_params_", LANG, "\\.yml$"), recursive = TRUE, full.names = TRUE)
+    if (length(FILE) == 0) {
+      FILE <- list.files(".", pattern = "_params\\.yml$", recursive = TRUE, full.names = TRUE)
+    }
     if (length(FILE) > 0) {
       FIELD <- read_yaml(FILE[1], readLines.warn = FALSE)
       if (has_authors_yml) {
@@ -93,10 +99,15 @@ buildReport <- function(
 
     # HTML
     if ("html" %in% output_format) {
-      FILE <- list.files(".", pattern = "_html\\.yml$", recursive = TRUE, full.names = TRUE)
+      FILE <- list.files(".", pattern = paste0("_html_", LANG, "\\.yml$"), recursive = TRUE, full.names = TRUE)
+      if (length(FILE) == 0) {
+        FILE <- list.files(".", pattern = "_html\\.yml$", recursive = TRUE, full.names = TRUE)
+      }
       if (length(FILE) > 0) {
         FIELD <- read_yaml(FILE[1], readLines.warn = FALSE)
-        FIELD$format <- FIELD$format[names(FIELD$format) %in% output_format]
+        if (!is.null(FIELD$format)) {
+          FIELD$format <- FIELD$format[names(FIELD$format) %in% output_format]
+        }
         DATA <- .merge(DATA, FIELD)
       } else {stop("No yaml headers file found")}
     }
@@ -104,10 +115,15 @@ buildReport <- function(
     
     # Reveal.js
     if ("revealjs" %in% output_format) {
-      FILE <- list.files(".", pattern = "_revealjs\\.yml$", recursive = TRUE, full.names = TRUE)
+      FILE <- list.files(".", pattern = paste0("_revealjs_", LANG, "\\.yml$"), recursive = TRUE, full.names = TRUE)
+      if (length(FILE) == 0) {
+        FILE <- list.files(".", pattern = "_revealjs\\.yml$", recursive = TRUE, full.names = TRUE)
+      }
       if (length(FILE) > 0) {
         FIELD <- read_yaml(FILE[1], readLines.warn = FALSE)
-        FIELD$format <- FIELD$format[names(FIELD$format) %in% output_format]
+        if (!is.null(FIELD$format)) {
+          FIELD$format <- FIELD$format[names(FIELD$format) %in% output_format]
+        }
         DATA <- .merge(DATA, FIELD)
       } else {stop("No yaml headers file found")}
       
@@ -115,10 +131,15 @@ buildReport <- function(
     
     # DOCX
     if ("docx" %in% output_format) {
-      FILE <- list.files(".", pattern = "_docx\\.yml$", recursive = TRUE, full.names = TRUE)
+      FILE <- list.files(".", pattern = paste0("_docx_", LANG, "\\.yml$"), recursive = TRUE, full.names = TRUE)
+      if (length(FILE) == 0) {
+        FILE <- list.files(".", pattern = "_docx\\.yml$", recursive = TRUE, full.names = TRUE)
+      }
       if (length(FILE) > 0) {
         FIELD <- read_yaml(FILE[1], readLines.warn = FALSE)
-        FIELD$format <- FIELD$format[names(FIELD$format) %in% output_format]
+        if (!is.null(FIELD$format)) {
+          FIELD$format <- FIELD$format[names(FIELD$format) %in% output_format]
+        }
         DATA <- .merge(DATA, FIELD)
       } else {stop("No yaml headers file found")}
       # Styles for DOCX
@@ -131,6 +152,21 @@ buildReport <- function(
       
     }
     
+    
+    # PDF
+    if ("pdf" %in% output_format) {
+      FILE <- list.files(".", pattern = paste0("_pdf_", LANG, "\\.yml$"), recursive = TRUE, full.names = TRUE)
+      if (length(FILE) == 0) {
+        FILE <- list.files(".", pattern = "_pdf\\.yml$", recursive = TRUE, full.names = TRUE)
+      }
+      if (length(FILE) > 0) {
+        FIELD <- read_yaml(FILE[1], readLines.warn = FALSE)
+        if (!is.null(FIELD$format)) {
+          FIELD$format <- FIELD$format[names(FIELD$format) %in% output_format]
+        }
+        DATA <- .merge(DATA, FIELD)
+      } else {stop("No yaml headers file found")}
+    }
     
     # Elsevier PDF
     if ("els-pdf" %in% output_format) {
@@ -189,7 +225,10 @@ buildReport <- function(
     }
     
     # Title
-    FILE <- list.files(".", pattern = "_TITLE\\.qmd$", recursive = TRUE, full.names = TRUE)
+    FILE <- list.files(".", pattern = paste0("_TITLE_", LANG, "\\.qmd$"), recursive = TRUE, full.names = TRUE)
+    if (length(FILE) == 0) {
+      FILE <- list.files(".", pattern = "_TITLE\\.qmd$", recursive = TRUE, full.names = TRUE)
+    }
     if (length(FILE) > 0) {
       VAR <- brio::read_lines(FILE[1]) |> paste(collapse = "\n")
       FIELD <- list(title = VAR)
@@ -197,7 +236,10 @@ buildReport <- function(
     }
     
     # Subtitle
-    FILE <- list.files(".", pattern = "_SUBTITLE\\.qmd$", recursive = TRUE, full.names = TRUE)
+    FILE <- list.files(".", pattern = paste0("_SUBTITLE_", LANG, "\\.qmd$"), recursive = TRUE, full.names = TRUE)
+    if (length(FILE) == 0) {
+      FILE <- list.files(".", pattern = "_SUBTITLE\\.qmd$", recursive = TRUE, full.names = TRUE)
+    }
     if (length(FILE) > 0) {
       VAR <- brio::read_lines(FILE[1]) |> paste(collapse = "\n")
       FIELD <- list(subtitle = VAR)
@@ -205,7 +247,10 @@ buildReport <- function(
     }
     
     # Abstract
-    FILE <- list.files(".", pattern = "_ABSTRACT\\.qmd$", recursive = TRUE, full.names = TRUE)
+    FILE <- list.files(".", pattern = paste0("_ABSTRACT_", LANG, "\\.qmd$"), recursive = TRUE, full.names = TRUE)
+    if (length(FILE) == 0) {
+      FILE <- list.files(".", pattern = "_ABSTRACT\\.qmd$", recursive = TRUE, full.names = TRUE)
+    }
     if (length(FILE) > 0) {
       VAR <- brio::read_lines(FILE[1]) |> paste(collapse = "\n")
       FIELD <- list(abstract = VAR)
@@ -328,14 +373,6 @@ buildReport <- function(
     # Build the YAML configuration
     .buildYAML()
 
-    if (render) {
-      quarto::quarto_render(
-        input = index_filename,
-        output_format = output_format
-      )
-    }
-
-    .postRender()
     
   }, error = function(e) {
     message("Error during rendering: ", e$message)

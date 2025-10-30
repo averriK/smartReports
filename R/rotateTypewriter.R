@@ -3,7 +3,7 @@
 #' @param filePaths Vector of paths to .txt files with ASCII content
 #' @param speed Speed in milliseconds per character (default 5)
 #' @param rotateDelay Delay in milliseconds before rotating to next file (default 3000)
-#' @param font Font name: "vt323", "ibm", "courier", "space", "anonymous", "press", "silkscreen", "atari", "c64", "dotgothic", "overpass", "nova", "syne", "data70" (default "vt323")
+#' @param font Font name: "vt323", "ibm", "courier", "space", "anonymous", "press", "silkscreen", "atari", "c64", "dotgothic", "overpass", "nova", "syne", "orbitron", "electrolize", "printchar21", "prnumber3", "data70" (default "vt323")
 #' @param fontSize Font size in em units (default 0.9)
 #' @param color Text color in hex (default "#00ff00")
 #' @param bgColor Background color in hex (default "#000")
@@ -88,6 +88,24 @@ rotateTypewriter <- function(filePaths,
       family = "'Syne Mono', monospace",
       link = "https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap"
     ),
+    "orbitron" = list(
+      family = "'Orbitron', sans-serif",
+      link = "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap"
+    ),
+    "electrolize" = list(
+      family = "'Electrolize', sans-serif",
+      link = "https://fonts.googleapis.com/css2?family=Electrolize&display=swap"
+    ),
+    "printchar21" = list(
+      family = "'Print Char 21', monospace",
+      link = NULL,
+      local = "PrintChar21"
+    ),
+    "prnumber3" = list(
+      family = "'PR Number 3', monospace",
+      link = NULL,
+      local = "PRNumber3"
+    ),
     "data70" = list(
       family = "'Data70', monospace",
       link = NULL,
@@ -101,9 +119,16 @@ rotateTypewriter <- function(filePaths,
   )
 
   # Build CSS style
+  # Use !important for local fonts to override revealjs CSS
+  font_decl <- if (!is.null(fontConfig$local)) {
+    sprintf("font-family: %s !important", fontConfig$family)
+  } else {
+    sprintf("font-family: %s", fontConfig$family)
+  }
+  
   style <- sprintf(
-    "font-family: %s; white-space: pre; font-size: %sem; color: %s; background-color: %s; padding: 20px; border-radius: 5px; width: 800px; margin: 0 auto;",
-    fontConfig$family, fontSize, color, bgColor
+    "%s; white-space: pre; font-size: %sem; color: %s; background-color: %s; padding: 20px; border-radius: 5px; width: 800px; margin: 0 auto;",
+    font_decl, fontSize, color, bgColor
   )
 
   # Escape all contents for JavaScript
@@ -125,16 +150,8 @@ rotateTypewriter <- function(filePaths,
     cat('<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n')
     cat(sprintf('<link href="%s" rel="stylesheet">\n\n', fontConfig$link))
   } else if (!is.null(fontConfig$local)) {
-    cat('<style>\n')
-    cat('@font-face {\n')
-    cat(sprintf('  font-family: %s;\n', fontConfig$family))
-    cat(sprintf('  src: url("psha/styles/fonts/%s.woff2") format("woff2"),\n', fontConfig$local))
-    cat(sprintf('       url("psha/styles/fonts/%s.woff") format("woff"),\n', fontConfig$local))
-    cat(sprintf('       url("psha/styles/fonts/%s.ttf") format("truetype");\n', fontConfig$local))
-    cat('  font-weight: normal;\n')
-    cat('  font-style: normal;\n')
-    cat('}\n')
-    cat('</style>\n\n')
+    # Local font - expects font to be installed on system
+    # No @font-face needed, browser will use system font
   }
 
   cat(sprintf('\n<div id="%s"></div>\n\n', id))

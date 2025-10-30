@@ -53,6 +53,7 @@
 #' @param point.dataLabels A logical for whether data labels appear for points
 #' @param plot.filename A string for the plot filename, if saving
 #' @param interpolation.method A string specifying the interpolation method used by `approx()`.
+#' @param fill.opacity Opacity for arearange fill (0-1).
 #'
 #' @return A highchart object if either `data.lines` or `data.points` is provided.
 #'         Returns NULL if both are NULL, with a soft warning.
@@ -104,6 +105,7 @@ buildPlot <- function(
     print.max.abs = FALSE,
     point.dataLabels = FALSE,
     plot.filename = NULL,
+    fill.opacity = 0.3,
     interpolation.method = "linear") {
     ## 1. Deprecation warnings for library, plot.type
     #    only trigger if the user explicitly set them (i.e. not missing)
@@ -387,7 +389,7 @@ buildPlot <- function(
                         hcaes(x = X, low = LOW, high = HIGH),
                         name = paste("Area between", gid1, "and", gid2),
                         color = ID.COLOR.MAP[as.character(gid1)],
-                        fillOpacity = 0.3 # Adjust transparency as needed
+                        fillOpacity = fill.opacity
                     )
             }
         }

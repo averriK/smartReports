@@ -46,6 +46,7 @@ buildPlot(
   print.max.abs = FALSE,
   point.dataLabels = FALSE,
   plot.filename = NULL,
+  fill.opacity = 0.3,
   interpolation.method = "linear"
 )
 }
@@ -134,6 +135,8 @@ If invalid, \code{"line"} is used.}
 \item{point.dataLabels}{A logical for whether data labels appear for points}
 
 \item{plot.filename}{A string for the plot filename, if saving}
+
+\item{fill.opacity}{Opacity for arearange fill (0-1).}
 
 \item{interpolation.method}{A string specifying the interpolation method used by \code{approx()}.}
 }
