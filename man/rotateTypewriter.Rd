@@ -2,10 +2,11 @@
 % Please edit documentation in R/rotateTypewriter.R
 \name{rotateTypewriter}
 \alias{rotateTypewriter}
-\title{Generate rotating typewriter effect from multiple text files}
+\title{Generate rotating typewriter effect from multiple text files or text strings}
 \usage{
 rotateTypewriter(
-  filePaths,
+  filePaths = NULL,
+  texts = NULL,
   speed = 5,
   rotateDelay = 3000,
   font = "vt323",
@@ -15,7 +16,9 @@ rotateTypewriter(
 )
 }
 \arguments{
-\item{filePaths}{Vector of paths to .txt files with ASCII content}
+\item{filePaths}{Vector of paths to .txt files with ASCII content (optional if texts is provided)}
+
+\item{texts}{Vector of text strings to rotate through (optional if filePaths is provided)}
 
 \item{speed}{Speed in milliseconds per character (default 5)}
 
@@ -33,5 +36,5 @@ rotateTypewriter(
 Prints HTML with rotating typewriter effect
 }
 \description{
-Generate rotating typewriter effect from multiple text files
+Generate rotating typewriter effect from multiple text files or text strings
 }

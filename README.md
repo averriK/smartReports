@@ -1025,7 +1025,7 @@ If you find discrepancies between documentation and actual behavior, please file
 smartReports includes vintage terminal typewriter effects for Quarto revealjs presentations. Three main functions:
 
 1. **`showTypewriter()`** - Single typewriter animation from text or file
-2. **`rotateTypewriter()`** - Rotating animations through multiple files  
+2. **`rotateTypewriter()`** - Rotating animations through multiple files or text strings
 3. **`buildIndexTypewriter()`** - Auto-generate chapter indexes with typewriter effect
 
 ### Available Vintage Fonts
@@ -1087,7 +1087,25 @@ buildIndexTypewriter(
 )
 ```
 
-#### 4. Rotating Animations (Movie Terminals)
+#### 4. Rotating Animations (from text strings - v0.4.1+)
+
+```r
+# Direct text strings (no files needed!)
+rotateTypewriter(
+  texts = c(
+    ">> SYSTEM BOOTING...\n>> KERNEL LOADED\n>> MEMORY CHECK: OK",
+    ">> DIAGNOSTICS RUNNING...\n>> ALL SYSTEMS NOMINAL",
+    ">> USER LOGIN DETECTED\n>> ACCESS GRANTED\n>> WELCOME, COMMANDER"
+  ),
+  speed = 5,
+  rotateDelay = 2000,
+  font = "vt323",
+  color = "#00ff00",
+  bgColor = "#000"
+)
+```
+
+#### 5. Rotating Animations (from files)
 
 ```r
 # HAL 9000 style (2001: A Space Odyssey)
@@ -1169,9 +1187,10 @@ showTypewriter(
 
 ```r
 rotateTypewriter(
-  filePaths,              # Vector of file paths
+  filePaths = NULL,       # Vector of file paths (optional if texts provided)
+  texts = NULL,           # Vector of text strings (optional if filePaths provided)
   speed = 5,              # Typing speed (ms/char)
-  rotateDelay = 3000,     # Delay before next file (ms)
+  rotateDelay = 3000,     # Delay before rotating to next text/file (ms)
   font = "vt323",
   fontSize = 0.9,
   color = "#00ff00",

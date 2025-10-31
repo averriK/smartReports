@@ -1,6 +1,7 @@
-#' Generate rotating typewriter effect from multiple text files
+#' Generate rotating typewriter effect from multiple text files or text strings
 #'
-#' @param filePaths Vector of paths to .txt files with ASCII content
+#' @param filePaths Vector of paths to .txt files with ASCII content (optional if texts is provided)
+#' @param texts Vector of text strings to rotate through (optional if filePaths is provided)
 #' @param speed Speed in milliseconds per character (default 5)
 #' @param rotateDelay Delay in milliseconds before rotating to next file (default 3000)
 #' @param font Font name: "vt323", "ibm", "courier", "space", "anonymous", "press", "silkscreen", "atari", "c64", "dotgothic", "overpass", "nova", "syne", "orbitron", "electrolize", "printchar21", "prnumber3", "data70" (default "vt323")
@@ -9,7 +10,8 @@
 #' @param bgColor Background color in hex (default "#000")
 #' @return Prints HTML with rotating typewriter effect
 #' @export
-rotateTypewriter <- function(filePaths,
+rotateTypewriter <- function(filePaths = NULL,
+                             texts = NULL,
                              speed = 5,
                              rotateDelay = 3000,
                              font = "vt323",
@@ -17,18 +19,40 @@ rotateTypewriter <- function(filePaths,
                              color = "#00ff00",
                              bgColor = "#000") {
 
-  # Validate input
-  if (is.null(filePaths) || length(filePaths) == 0) {
-    stop("filePaths must contain at least one file path")
+  # Validate input: either texts or filePaths must be provided
+  if (is.null(texts) && is.null(filePaths)) {
+    stop("Either 'texts' or 'filePaths' must be provided")
+  }
+  
+  if (!is.null(texts) && !is.null(filePaths)) {
+    warning("Both 'texts' and 'filePaths' provided; using 'texts' and ignoring 'filePaths'")
   }
 
-  # Read all files
+  # Determine content source
   contents <- list()
-  for (filePath in filePaths) {
-    if (!file.exists(filePath)) {
-      stop(paste("File not found:", filePath))
+  
+  if (!is.null(texts)) {
+    # Use text strings directly
+    if (length(texts) == 0) {
+      stop("texts must contain at least one string")
     }
-    contents[[length(contents) + 1]] <- paste(readLines(filePath, warn = FALSE), collapse = "\n")
+    for (text in texts) {
+      # Trim leading and trailing whitespace/newlines
+      content <- sub("^[\\s\\n]+", "", text)
+      content <- sub("[\\s\\n]+$", "", content)
+      contents[[length(contents) + 1]] <- content
+    }
+  } else {
+    # Read from files
+    if (length(filePaths) == 0) {
+      stop("filePaths must contain at least one file path")
+    }
+    for (filePath in filePaths) {
+      if (!file.exists(filePath)) {
+        stop(paste("File not found:", filePath))
+      }
+      contents[[length(contents) + 1]] <- paste(readLines(filePath, warn = FALSE), collapse = "\n")
+    }
   }
 
   # Generate unique ID
