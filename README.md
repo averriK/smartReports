@@ -923,7 +923,33 @@ If you use this package in your research or professional work, please cite:
 
 ## Changelog
 
-### Version 0.3.3 (Current)
+### Version 0.4.1 (Current - Development Branch)
+
+**Typewriter Enhancements:**
+- Added `texts=` parameter to `rotateTypewriter()` for direct string vectors (no file creation needed)
+- Added `terminalWidth=` parameter to both `showTypewriter()` and `rotateTypewriter()`
+- Emulate classic terminal widths: 40, 60, or 80 columns
+- Auto-calculated width based on fontSize: `(columns × 0.6em × fontSize) + 4em`
+- Validates terminalWidth input (40/60/80) with warning for invalid values
+- Backward compatible: default behavior unchanged (800px when terminalWidth = NULL)
+
+**Histogram Functions:**
+- Renamed `buildHist2D` → `buildPlot.Hist2D` for naming consistency
+- Renamed `buildHist3D` → `buildPlot.Hist3D` for naming consistency
+- Fixed critical bug in `get_decimal_places()` that only processed first vector element
+- Removed dead code in `buildPlot.Hist3D` (unused color.scale initialization)
+- Updated NAMESPACE and documentation
+
+**Documentation:**
+- Expanded README with detailed viewer utilities documentation (`showASCII`, `showMarkdownRendered`)
+- Added examples for terminal width emulation
+- Updated function parameter documentation
+
+**Breaking Changes:**
+- `buildHist2D` and `buildHist3D` renamed (use `buildPlot.Hist2D`, `buildPlot.Hist3D`)
+- Both old and new names work during transition period
+
+### Version 0.3.3
 
 **Plot Enhancements:**
 - Refactored `buildPlot()` to support separate `data.lines` and `data.points` inputs
