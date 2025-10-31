@@ -12,8 +12,7 @@ buildYAML(
   language = "EN",
   output_format = c("html"),
   extensions = c("spl", "bst", "cls", "md", "aux", "log", "tex", "jpg", "sty", "docx",
-    "pdf", "html"),
-  render = TRUE
+    "pdf", "html")
 )
 }
 \arguments{
@@ -30,8 +29,6 @@ buildYAML(
 \item{output_format}{Character vector of output formats to include (e.g. \code{c("html","pdf")}).}
 
 \item{extensions}{Reserved for future cleanup behavior (currently used only on error paths).}
-
-\item{render}{Ignored. Rendering should be done via Quarto after this function returns.}
 }
 \description{
 Assemble a consolidated Quarto configuration (\verb{_quarto.yml}) by merging project files

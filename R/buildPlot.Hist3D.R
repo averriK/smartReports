@@ -1,28 +1,31 @@
 
-#' Title
+#' Build 3D bar histogram with plotly
 #'
-#' @param data data.table
-#' @param nbins integer
-#' @param bin.width numeric
-#' @param xAxis.label string
-#' @param yAxis.label string
-#' @param zAxis.label string
-#' @param aspect.ratio list
-#' @param xAxis.legend boolean
-#' @param yAxis.legend boolean
-#' @param zAxis.legend boolean
-#' @param xAxis.tickangle numeric
-#' @param yAxis.tickangle numeric
-#' @param zAxis.tickangle numeric
-#' @param axis.fontsize string
-#' @param legend.font string
-#' @param legend.valign string
-#' @param color.palette palette
-#' @param caption string
-#' @param plot.title string
-#' @param title.fontsize string
-#' @param title.font string
-#' @param smooth.factor integer
+#' Creates a 3D bar histogram from data with X, Y, and Z columns.
+#' Z values are accumulated into 2D bins and rendered as 3D bars.
+#'
+#' @param data data.table with columns X, Y, Z
+#' @param nbins integer, number of bins in each dimension (default 15)
+#' @param bin.width numeric, width of 3D bars (default 0.4)
+#' @param xAxis.label string, x-axis label
+#' @param yAxis.label string, y-axis label
+#' @param zAxis.label string, z-axis label (height)
+#' @param smooth.factor integer, smoothing factor 1-5 (default 3). Currently not implemented; reserved for future use.
+#' @param aspect.ratio list, aspect ratio for axes (default list(x=1, y=1, z=1.5))
+#' @param xAxis.legend boolean, show x-axis labels (default TRUE)
+#' @param yAxis.legend boolean, show y-axis labels (default TRUE)
+#' @param zAxis.legend boolean, show z-axis labels (default FALSE)
+#' @param xAxis.tickangle numeric, x-axis tick rotation (default 0)
+#' @param yAxis.tickangle numeric, y-axis tick rotation (default 0)
+#' @param zAxis.tickangle numeric, z-axis tick rotation (default 0)
+#' @param axis.fontsize string, axis label font size (default "14px")
+#' @param legend.font string, font family (default "Arial")
+#' @param legend.valign string, legend vertical alignment (default "top")
+#' @param color.palette string, color palette name from hcl.pals() (default "Viridis")
+#' @param caption string, plot caption (optional)
+#' @param plot.title string, plot title (optional)
+#' @param title.fontsize string, title font size (default "24px")
+#' @param title.font string, title font family (default "Arial")
 #' @importFrom plotly plot_ly
 #' @importFrom plotly add_trace
 #' @importFrom plotly layout
@@ -31,7 +34,8 @@
 #' @import grDevices
 #'
 #' @return plotly object
-buildHist3D <- function(data, 
+#' @export
+buildPlot.Hist3D <- function(data,
                    nbins = 15, 
                    bin.width = 0.4, 
                    xAxis.label = "x", 
@@ -56,8 +60,6 @@ buildHist3D <- function(data,
   
   # X_bin <- Y_bin <- Z_bin <- Z <- NULL
   DT <- . <-  NULL
- color.scale <- hcl.colors(6, palette = hcl.pals()[6])  
-  
   
   # Set axis limits based on the provided data or user input
   Xmin <-min(data$X)
@@ -237,6 +239,9 @@ get_decimal_places <- function(x) {
   if (all(x == round(x))) {
     return(0)
   } else {
-    return(max(nchar(strsplit(as.character(x), "\\.")[[1]][2]), na.rm = TRUE))
+    decimals <- sapply(strsplit(as.character(x), "\\."), function(parts) {
+      if (length(parts) == 2) nchar(parts[2]) else 0
+    })
+    return(max(decimals, na.rm = TRUE))
   }
 }

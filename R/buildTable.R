@@ -242,10 +242,13 @@ buildTable <- function(.x,
                               font.bold.header, font.bold.body, vlines.show, hlines.show, vlines.color, hlines.color,
                               vlines.size, hlines.size, align.header, align.body, caption) {
 
-  TABLE <- kableExtra::kable(.x, format = format, caption = caption, escape = FALSE)
+  # Normalize format for knitr/kable
+  fmt <- if (tolower(format) == "pdf") "latex" else format
+
+  TABLE <- kableExtra::kable(.x, format = fmt, caption = caption, escape = FALSE)
 
   # Font and style settings
-  TABLE <- kableExtra::kable(.x, format = format, escape = FALSE) |>
+  TABLE <- TABLE |>
     kableExtra::kable_styling(full_width = FALSE, position = "center", font_size = font.size.body)
 
   # Header formatting

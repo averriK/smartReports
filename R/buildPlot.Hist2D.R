@@ -1,21 +1,24 @@
-#' Title
+#' Build 2D histogram or contour plot with plotly
 #'
-#' @param data data.table
-#' @param nbins integer
-#' @param xAxis.label string
-#' @param yAxis.label string
-#' @param zAxis.label string
-#' @param xAxis.min numeric
-#' @param xAxis.max   numeric
-#' @param yAxis.min numeric
-#' @param yAxis.max numeric  
-#' @param axis.fontsize string
-#' @param legend.font string
-#' @param color.palette palette
-#' @param plot.type string
-#' @param plot.title string
-#' @param title.fontsize string
-#' @param title.font string
+#' Creates a 2D heatmap or contour plot from data with X, Y, and Z columns.
+#' Z values are accumulated into 2D bins defined by nbins parameter.
+#'
+#' @param data data.table with columns X, Y, Z
+#' @param nbins integer, number of bins in each dimension (default 30)
+#' @param xAxis.label string, x-axis label
+#' @param yAxis.label string, y-axis label
+#' @param zAxis.label string, colorbar label
+#' @param xAxis.min numeric, minimum x value (default: min(data$X))
+#' @param xAxis.max numeric, maximum x value (default: max(data$X))
+#' @param yAxis.min numeric, minimum y value (default: min(data$Y))
+#' @param yAxis.max numeric, maximum y value (default: max(data$Y))
+#' @param axis.fontsize string, axis label font size (default "14px")
+#' @param legend.font string, axis font family (default "Arial")
+#' @param color.palette string, color palette name from \code{grDevices::hcl.pals()} (default: 33rd palette)
+#' @param plot.type string, either "heatmap" or "contour"
+#' @param plot.title string, plot title (optional)
+#' @param title.fontsize string, title font size (default "24px")
+#' @param title.font string, title font family (default "Arial")
 #'
 #' @importFrom plotly plot_ly
 #' @importFrom plotly add_trace
@@ -23,15 +26,12 @@
 #' @importFrom plotly toRGB
 #' @import data.table
 #' @import grDevices
-
-#' 
-#' @import data.table
-#' @import grDevices
 #'
 #' @return plotly object
+#' @export
 
 
-buildHist2D <- function(data, 
+buildPlot.Hist2D <- function(data,
                    nbins = 30, 
                    xAxis.label = "x", 
                    yAxis.label = "y", 
@@ -125,6 +125,9 @@ get_decimal_places <- function(x) {
   if (all(x == round(x))) {
     return(0)
   } else {
-    return(max(nchar(strsplit(as.character(x), "\\.")[[1]][2]), na.rm = TRUE))
+    decimals <- sapply(strsplit(as.character(x), "\\."), function(parts) {
+      if (length(parts) == 2) nchar(parts[2]) else 0
+    })
+    return(max(decimals, na.rm = TRUE))
   }
 }

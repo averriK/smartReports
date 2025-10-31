@@ -3,6 +3,8 @@
 export(buildIndexTypewriter)
 export(buildPlot)
 export(buildPlot.Bar)
+export(buildPlot.Hist2D)
+export(buildPlot.Hist3D)
 export(buildPlot.Histogram)
 export(buildPlot.Model)
 export(buildTable)

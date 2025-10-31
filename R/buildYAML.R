@@ -14,7 +14,6 @@
 #' @param language Language code (e.g. `"EN"`, `"ES"`) to pick suffixed files like `_html_ES.yml`.
 #' @param output_format Character vector of output formats to include (e.g. `c("html","pdf")`).
 #' @param extensions Reserved for future cleanup behavior (currently used only on error paths).
-#' @param render Ignored. Rendering should be done via Quarto after this function returns.
 #'
 #' @import data.table
 #' @import yaml
@@ -26,8 +25,7 @@ buildYAML <- function(
     quarto_filename = "_quarto.yml",
     language = "EN",
     output_format = c("html"),
-    extensions = c("spl", "bst", "cls", "md", "aux", "log", "tex", "jpg", "sty","docx", "pdf", "html"),
-    render = TRUE
+    extensions = c("spl", "bst", "cls", "md", "aux", "log", "tex", "jpg", "sty","docx", "pdf", "html")
 ) {
   . <- NULL 
   
