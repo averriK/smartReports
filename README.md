@@ -1140,6 +1140,50 @@ rotateTypewriter(
 )
 ```
 
+### Terminal Width (v0.4.1+)
+
+Emulate classic terminal column widths:
+
+```r
+# Commodore 64 - 40 columns
+showTypewriter(
+  text = ">> COMMODORE 64 BASIC V2\n>> 38911 BASIC BYTES FREE\n>> READY.",
+  font = "c64",
+  fontSize = 0.8,
+  color = "#8888ff",
+  bgColor = "#4040cc",
+  terminalWidth = 40  # 40-column display
+)
+
+# DEC VT320 - 80 columns
+showTypewriter(
+  text = ">> DEC VT320 TERMINAL\n>> LOGIN: root",
+  font = "vt323",
+  fontSize = 0.9,
+  color = "#00ff00",
+  bgColor = "#000",
+  terminalWidth = 80  # 80-column display
+)
+
+# IBM PC - 60 columns
+rotateTypewriter(
+  texts = c(
+    ">> IBM PC XT\n>> ROM BASIC",
+    ">> (C) IBM 1981"
+  ),
+  font = "ibm",
+  fontSize = 0.85,
+  color = "#ffb000",
+  bgColor = "#000",
+  terminalWidth = 60  # 60-column display
+)
+
+# Default: 800px (no terminalWidth specified)
+```
+
+**Supported widths:** 40, 60, 80 columns (auto-calculated based on fontSize)  
+**Default:** NULL (uses fixed 800px width)
+
 ### Color Palettes
 
 **Classic CRT Terminal Colors:**
@@ -1179,7 +1223,8 @@ showTypewriter(
   font = "vt323",        # Font name (see table above)
   fontSize = 0.9,         # Em units
   color = "#00ff00",     # Text color (hex)
-  bgColor = "#000"       # Background color (hex)
+  bgColor = "#000",      # Background color (hex)
+  terminalWidth = NULL   # Terminal columns: 40, 60, 80, or NULL (800px)
 )
 ```
 
@@ -1194,7 +1239,8 @@ rotateTypewriter(
   font = "vt323",
   fontSize = 0.9,
   color = "#00ff00",
-  bgColor = "#000"
+  bgColor = "#000",
+  terminalWidth = NULL    # Terminal columns: 40, 60, 80, or NULL (800px)
 )
 ```
 

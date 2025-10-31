@@ -7,6 +7,7 @@
 #' @param fontSize Font size in em units (default 0.9)
 #' @param color Text color in hex (default "#00ff00")
 #' @param bgColor Background color in hex (default "#000")
+#' @param terminalWidth Terminal width in columns: 40, 60, 80, or NULL for auto (800px). Default NULL.
 #' @return Prints HTML with typewriter effect
 #' @export
 showTypewriter <- function(filePath = NULL,
@@ -15,7 +16,8 @@ showTypewriter <- function(filePath = NULL,
                            font = "vt323",
                            fontSize = 0.9,
                            color = "#00ff00",
-                           bgColor = "#000") {
+                           bgColor = "#000",
+                           terminalWidth = NULL) {
   
   # Generate unique ID based on timestamp with microseconds
   id <- paste0("typewriter-", gsub("[^0-9]", "", format(Sys.time(), "%Y%m%d%H%M%OS6")))
@@ -126,9 +128,26 @@ showTypewriter <- function(filePath = NULL,
     sprintf("font-family: %s", fontConfig$family)
   }
   
+  # Calculate width based on terminalWidth (columns) or use default
+  # Average monospace character width: ~0.6em
+  width_css <- if (!is.null(terminalWidth)) {
+    # Validate terminalWidth
+    if (!terminalWidth %in% c(40, 60, 80)) {
+      warning("terminalWidth should be 40, 60, or 80. Using 80.")
+      terminalWidth <- 80
+    }
+    # width = columns * char_width + padding
+    # char_width ≈ fontSize * 0.6em
+    char_width <- fontSize * 0.6
+    content_width <- terminalWidth * char_width
+    sprintf("width: %.2fem", content_width + 4)  # +4em for padding (20px ≈ 2em per side)
+  } else {
+    "width: 800px"  # Default fixed width
+  }
+  
   style <- sprintf(
-    "%s; white-space: pre; font-size: %sem; color: %s; background-color: %s; padding: 20px; border-radius: 5px; width: 800px; margin: 0 auto;",
-    font_decl, fontSize, color, bgColor
+    "%s; white-space: pre; font-size: %sem; color: %s; background-color: %s; padding: 20px; border-radius: 5px; %s; margin: 0 auto;",
+    font_decl, fontSize, color, bgColor, width_css
   )
   
   # Escape for JavaScript (order matters!)
@@ -195,10 +214,10 @@ showTypewriter <- function(filePath = NULL,
   cat('      initTypewriter();\n')
   cat('    }\n')
   cat('  }\n\n')
-  cat('  if (document.readyState === "complete") {\n')
-  cat('    setup();\n')
+  cat('  if (document.readyState === "loading") {\n')
+  cat('    document.addEventListener("DOMContentLoaded", setup);\n')
   cat('  } else {\n')
-  cat('    window.addEventListener("load", setup);\n')
+  cat('    setup();\n')
   cat('  }\n')
   cat('})();\n')
   cat('</script>\n\n')

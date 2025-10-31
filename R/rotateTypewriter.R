@@ -8,6 +8,7 @@
 #' @param fontSize Font size in em units (default 0.9)
 #' @param color Text color in hex (default "#00ff00")
 #' @param bgColor Background color in hex (default "#000")
+#' @param terminalWidth Terminal width in columns: 40, 60, 80, or NULL for auto (800px). Default NULL.
 #' @return Prints HTML with rotating typewriter effect
 #' @export
 rotateTypewriter <- function(filePaths = NULL,
@@ -17,7 +18,8 @@ rotateTypewriter <- function(filePaths = NULL,
                              font = "vt323",
                              fontSize = 0.9,
                              color = "#00ff00",
-                             bgColor = "#000") {
+                             bgColor = "#000",
+                             terminalWidth = NULL) {
 
   # Validate input: either texts or filePaths must be provided
   if (is.null(texts) && is.null(filePaths)) {
@@ -150,9 +152,22 @@ rotateTypewriter <- function(filePaths = NULL,
     sprintf("font-family: %s", fontConfig$family)
   }
   
+  # Calculate width based on terminalWidth (columns) or use default
+  width_css <- if (!is.null(terminalWidth)) {
+    if (!terminalWidth %in% c(40, 60, 80)) {
+      warning("terminalWidth should be 40, 60, or 80. Using 80.")
+      terminalWidth <- 80
+    }
+    char_width <- fontSize * 0.6
+    content_width <- terminalWidth * char_width
+    sprintf("width: %.2fem", content_width + 4)
+  } else {
+    "width: 800px"
+  }
+  
   style <- sprintf(
-    "%s; white-space: pre; font-size: %sem; color: %s; background-color: %s; padding: 20px; border-radius: 5px; width: 800px; margin: 0 auto;",
-    font_decl, fontSize, color, bgColor
+    "%s; white-space: pre; font-size: %sem; color: %s; background-color: %s; padding: 20px; border-radius: 5px; %s; margin: 0 auto;",
+    font_decl, fontSize, color, bgColor, width_css
   )
 
   # Escape all contents for JavaScript
@@ -235,7 +250,12 @@ rotateTypewriter <- function(filePaths = NULL,
   cat('    if (rotateTimeoutId) clearTimeout(rotateTimeoutId);\n')
   cat('  }\n\n')
 
-  cat('  window.addEventListener("load", function() {\n')
+  cat('  if (document.readyState === "loading") {\n')
+  cat('    document.addEventListener("DOMContentLoaded", initTypewriter);\n')
+  cat('  } else {\n')
+  cat('    initTypewriter();\n')
+  cat('  }\n\n')
+  cat('  function initTypewriter() {\n')
   cat('    if (typeof Reveal !== "undefined") {\n')
   cat('      Reveal.on("slidechanged", function(event) {\n')
   cat('        const container = document.getElementById(containerId);\n')
@@ -248,8 +268,10 @@ rotateTypewriter <- function(filePaths = NULL,
   cat('        }\n')
   cat('      });\n')
   cat('      setTimeout(startTypewriter, 500);\n')
+  cat('    } else {\n')
+  cat('      setTimeout(initTypewriter, 100);\n')
   cat('    }\n')
-  cat('  });\n')
+  cat('  }\n')
   cat('})();\n')
   cat('</script>\n\n')
   cat(sprintf('<style>\n#%s { %s }\n</style>\n\n', id, style))

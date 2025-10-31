@@ -12,7 +12,8 @@ rotateTypewriter(
   font = "vt323",
   fontSize = 0.9,
   color = "#00ff00",
-  bgColor = "#000"
+  bgColor = "#000",
+  terminalWidth = NULL
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ rotateTypewriter(
 \item{color}{Text color in hex (default "#00ff00")}
 
 \item{bgColor}{Background color in hex (default "#000")}
+
+\item{terminalWidth}{Terminal width in columns: 40, 60, 80, or NULL for auto (800px). Default NULL.}
 }
 \value{
 Prints HTML with rotating typewriter effect
